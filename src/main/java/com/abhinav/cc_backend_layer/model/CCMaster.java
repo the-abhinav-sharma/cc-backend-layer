@@ -4,9 +4,11 @@ import java.sql.Date;
 import java.sql.Timestamp;
 
 import jakarta.persistence.EmbeddedId;
+import jakarta.persistence.Entity;
 import lombok.Data;
 
 @Data
+@Entity(name = "CC_MASTER")
 public class CCMaster {
 	@EmbeddedId
 	private CCMasterKey key;
