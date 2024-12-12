@@ -3,6 +3,7 @@ package com.abhinav.cc_backend_layer.service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -45,9 +46,8 @@ public class CCMasterService {
 
 	public void loadCardNames() {
 		if (codeNames.isEmpty()) {
-			for (CCMasterNames masterNames : ccMasterNamesRepository.findAll()) {
-				codeNames.put(masterNames.getCode(), masterNames.getName());
-			}
+			codeNames = ccMasterNamesRepository.findAll().stream()
+					.collect(Collectors.toMap(CCMasterNames::getCode, CCMasterNames::getName));
 		}
 	}
 
