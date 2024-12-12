@@ -32,8 +32,7 @@ public class CCMasterService {
 		CCMasterKey key = new CCMasterKey();
 		key.setCode(code);
 		key.setStmtMonthYear(monthYear);
-		CCMaster ccMaster = ccMasterRepository.findById(key).orElse(null);
-		return updateObjectWithName(ccMaster);
+		return updateObjectWithName(ccMasterRepository.findById(key).orElse(null));
 	}
 
 	public List<CCMaster> getByCode(String code) {
@@ -58,7 +57,9 @@ public class CCMasterService {
 	}
 
 	private CCMaster updateObjectWithName(CCMaster ccMaster) {
-		ccMaster.setName(codeNames.get(ccMaster.getKey().getCode()));
+		if (ccMaster != null) {
+			ccMaster.setName(codeNames.get(ccMaster.getKey().getCode()));
+		}
 		return ccMaster;
 	}
 }
