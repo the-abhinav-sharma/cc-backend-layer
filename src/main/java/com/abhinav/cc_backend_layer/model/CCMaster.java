@@ -8,7 +8,7 @@ import jakarta.persistence.Entity;
 import lombok.Data;
 
 @Data
-@Entity(name = "CC_MASTER")
+@Entity(name = "CC_MASTER_NEW")
 public class CCMaster {
 	@EmbeddedId
 	private CCMasterKey key;
