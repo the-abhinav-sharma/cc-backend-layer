@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Transient;
 import lombok.Data;
 
 @Data
@@ -12,6 +13,7 @@ import lombok.Data;
 public class CCMaster {
 	@EmbeddedId
 	private CCMasterKey key;
+	@Transient
 	private String name;
 	private Double minAmt;
 	private Double totalAmt;
