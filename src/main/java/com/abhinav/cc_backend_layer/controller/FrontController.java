@@ -1,8 +1,21 @@
 package com.abhinav.cc_backend_layer.controller;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.List;
 
+import javax.imageio.ImageIO;
+
+import org.apache.tomcat.util.codec.binary.Base64;
+import org.springframework.ai.image.ImageOptions;
+import org.springframework.ai.image.ImageOptionsBuilder;
+import org.springframework.ai.image.ImagePrompt;
+import org.springframework.ai.image.ImageResponse;
+import org.springframework.ai.openai.OpenAiImageModel;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,6 +38,9 @@ public class FrontController {
 	
 	@Autowired
 	private OpenAIService openAIService;
+	
+	@Autowired
+	OpenAiImageModel openAiImageModel;
 
 	@GetMapping("/health")
 	public String health() {
@@ -35,6 +51,27 @@ public class FrontController {
 	public Answer getAnswer(@RequestBody Question question) {
 		return openAIService.getAnswer(question);
 	}
+	
+	@PostMapping(path = "/image", produces = MediaType.IMAGE_PNG_VALUE)
+	public byte[] getImage(@RequestBody Question question) throws IOException {
+		 ImageOptions options = ImageOptionsBuilder.builder()
+	                .withModel("dall-e-3")
+                    .withN(1)
+                    .withHeight(1024)
+                    .withWidth(1024).withResponseFormat("b64_json")
+	                .build();
+	        ImagePrompt imagePrompt = new ImagePrompt(question.question(), options);
+	        ImageResponse response = openAiImageModel.call(imagePrompt);
+
+	        byte[] decodedBytes = Base64.decodeBase64(response.getResult().getOutput().getB64Json());
+            ByteArrayInputStream bais = new ByteArrayInputStream(decodedBytes);
+            BufferedImage image = ImageIO.read(bais);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ImageIO.write(image, "png", baos);
+            
+            return baos.toByteArray();
+	}
+
 
 	@GetMapping("/get")
 	public List<CCMaster> get() {
