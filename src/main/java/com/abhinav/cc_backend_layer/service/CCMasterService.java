@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import com.abhinav.cc_backend_layer.model.CCMaster;
 import com.abhinav.cc_backend_layer.model.CCMasterKey;
 import com.abhinav.cc_backend_layer.model.CCMasterNames;
+import com.abhinav.cc_backend_layer.model.AmountPerMonth;
 import com.abhinav.cc_backend_layer.repository.CCMasterNamesRepository;
 import com.abhinav.cc_backend_layer.repository.CCMasterRepository;
 
@@ -61,5 +62,9 @@ public class CCMasterService {
 			ccMaster.setName(codeNames.get(ccMaster.getKey().getCode()));
 		}
 		return ccMaster;
+	}
+	
+	public List<AmountPerMonth> getAmountPerMonth() {
+		return ccMasterRepository.getAmountPerMonth();
 	}
 }

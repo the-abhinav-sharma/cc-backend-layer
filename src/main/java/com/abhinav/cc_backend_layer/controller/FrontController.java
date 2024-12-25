@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.abhinav.cc_backend_layer.model.AmountPerMonth;
 import com.abhinav.cc_backend_layer.model.Answer;
 import com.abhinav.cc_backend_layer.model.CCMaster;
 import com.abhinav.cc_backend_layer.model.Question;
@@ -90,7 +91,11 @@ public class FrontController {
 		} else {
 			return ccMasterService.getByCode(param);
 		}
-
+	}
+	
+	@GetMapping("/monthlyTotal")
+	public List<AmountPerMonth> monthlyTotal() {
+		return ccMasterService.getAmountPerMonth();
 	}
 
 }
