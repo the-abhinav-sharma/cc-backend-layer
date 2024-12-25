@@ -9,7 +9,7 @@ import jakarta.persistence.Transient;
 import lombok.Data;
 
 @Data
-@Entity(name = "CC_MASTER_NEW")
+@Entity(name = "CC_MASTER_TEST")
 public class CCMaster {
 	@EmbeddedId
 	private CCMasterKey key;
@@ -19,7 +19,7 @@ public class CCMaster {
 	private Double totalAmt;
 	private Date dueDate;
 	private Date payDate;
-	private Double balanceAmt;
+	//private Double balanceAmt;
 	private String currentStatus;
 	private String remarks;
 	private Timestamp createdOn;
