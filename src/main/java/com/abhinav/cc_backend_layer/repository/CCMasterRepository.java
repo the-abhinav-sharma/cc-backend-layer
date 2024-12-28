@@ -17,7 +17,7 @@ public interface CCMasterRepository extends JpaRepository<CCMaster, CCMasterKey>
 
 	List<CCMaster> findAllByKeyStmtMonthYear(String monthYear);
 
-	@Query(value = "select SUBSTR(STMTMONTHYEAR,0,2) as mm, SUBSTR(STMTMONTHYEAR,3,6) as yyyy, SUM(CAST(TOTALAMT as DECIMAL(10,2))) as amount from  CC_MASTER_TEST group by SUBSTR(STMTMONTHYEAR,0,2),SUBSTR(STMTMONTHYEAR,2,4)", nativeQuery = true)
+	@Query(value = "select SUBSTR(STMTMONTHYEAR,0,2) as mm, SUBSTR(STMTMONTHYEAR,3,6) as yyyy, SUM(CAST(TOTALAMT as INTEGER)) as amount from  CC_MASTER_TEST group by SUBSTR(STMTMONTHYEAR,0,2),SUBSTR(STMTMONTHYEAR,2,4)", nativeQuery = true)
 	List<AmountPerMonth> getAmountPerMonth();
 
 }
