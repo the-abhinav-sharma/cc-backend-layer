@@ -97,5 +97,10 @@ public class FrontController {
 	public List<AmountPerMonth> monthlyTotal() {
 		return ccMasterService.getAmountPerMonth();
 	}
+	
+	@GetMapping("/cardlyTotal")
+	public List<AmountPerMonth> cardlyTotal() {
+		return ccMasterService.getAmountPerCard();
+	}
 
 }

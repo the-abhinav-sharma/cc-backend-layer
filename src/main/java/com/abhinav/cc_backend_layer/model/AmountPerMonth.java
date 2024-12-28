@@ -5,6 +5,8 @@ public interface AmountPerMonth {
 
 	String getYyyy();
 
-	Double getAmount();
+	Integer getAmount();
+	
+	String getCode();
 
 }
