@@ -7,6 +7,6 @@ public interface AmountPerMonth {
 
 	Integer getAmount();
 	
-	String getCode();
+	String getName();
 
 }
