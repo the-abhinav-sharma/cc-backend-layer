@@ -24,7 +24,11 @@ public class CCMasterService {
 	@Autowired
 	CCMasterNamesRepository ccMasterNamesRepository;
 
-	Map<String, String> codeNames = new HashMap<>();
+	public Map<String, String> codeNames = new HashMap<>();
+	
+	public CCMaster create(CCMaster ccMaster) {
+		return ccMasterRepository.saveAndFlush(ccMaster);
+	}
 
 	public List<CCMaster> getAll() {
 		return updateListWithNames(ccMasterRepository.findAll());

@@ -5,6 +5,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import javax.imageio.ImageIO;
 
@@ -78,6 +79,11 @@ public class FrontController {
 	public List<CCMaster> get() {
 		return ccMasterService.getAll();
 	}
+	
+	@PostMapping("/create")
+	public CCMaster create(@RequestBody CCMaster ccMaster) {
+		return ccMasterService.create(ccMaster);
+	}
 
 	@GetMapping("/get/{code}/{monthYear}")
 	public CCMaster getByCodeAndMonthYear(@PathVariable String code, @PathVariable String monthYear) {
@@ -101,6 +107,11 @@ public class FrontController {
 	@GetMapping("/cardlyTotal")
 	public List<AmountPerMonth> cardlyTotal() {
 		return ccMasterService.getAmountPerCard();
+	}
+	
+	@GetMapping("/cardNames")
+	public Map<String, String> loadCardNames() {
+		return ccMasterService.codeNames;
 	}
 
 }

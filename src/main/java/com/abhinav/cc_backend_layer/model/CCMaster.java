@@ -17,6 +17,7 @@ public class CCMaster {
 	private String name;
 	private Double minAmt;
 	private Double totalAmt;
+	private Date stmtDate;
 	private Date dueDate;
 	private Date payDate;
 	//private Double balanceAmt;
