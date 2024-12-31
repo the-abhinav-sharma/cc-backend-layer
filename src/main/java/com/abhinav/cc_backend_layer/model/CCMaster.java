@@ -15,12 +15,11 @@ public class CCMaster {
 	private CCMasterKey key;
 	@Transient
 	private String name;
-	private Double minAmt;
-	private Double totalAmt;
+	private Integer minAmt;
+	private Integer totalAmt;
 	private Date stmtDate;
 	private Date dueDate;
 	private Date payDate;
-	//private Double balanceAmt;
 	private String currentStatus;
 	private String remarks;
 	private Timestamp createdOn;

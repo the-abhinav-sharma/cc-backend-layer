@@ -1,17 +1,18 @@
 package com.abhinav.cc_backend_layer.service;
 
-import java.util.HashMap;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.abhinav.cc_backend_layer.model.AmountPerMonth;
 import com.abhinav.cc_backend_layer.model.CCMaster;
 import com.abhinav.cc_backend_layer.model.CCMasterKey;
 import com.abhinav.cc_backend_layer.model.CCMasterNames;
-import com.abhinav.cc_backend_layer.model.AmountPerMonth;
 import com.abhinav.cc_backend_layer.repository.CCMasterNamesRepository;
 import com.abhinav.cc_backend_layer.repository.CCMasterRepository;
 
@@ -24,9 +25,10 @@ public class CCMasterService {
 	@Autowired
 	CCMasterNamesRepository ccMasterNamesRepository;
 
-	public Map<String, String> codeNames = new HashMap<>();
+	public Map<String, String> codeNames = new TreeMap<>();
 	
 	public CCMaster create(CCMaster ccMaster) {
+		ccMaster.setCreatedOn(new Timestamp(System.currentTimeMillis()));
 		return ccMasterRepository.saveAndFlush(ccMaster);
 	}
 
@@ -51,8 +53,9 @@ public class CCMasterService {
 
 	public void loadCardNames() {
 		if (codeNames.isEmpty()) {
-			codeNames = ccMasterNamesRepository.findAll().stream()
+			Map<String, String> temp = ccMasterNamesRepository.findAll().stream()
 					.collect(Collectors.toMap(CCMasterNames::getCode, CCMasterNames::getName));
+			codeNames.putAll(temp);
 		}
 	}
 

@@ -6,9 +6,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import com.abhinav.cc_backend_layer.model.AmountPerMonth;
 import com.abhinav.cc_backend_layer.model.CCMaster;
 import com.abhinav.cc_backend_layer.model.CCMasterKey;
-import com.abhinav.cc_backend_layer.model.AmountPerMonth;
 
 @Repository
 public interface CCMasterRepository extends JpaRepository<CCMaster, CCMasterKey> {
