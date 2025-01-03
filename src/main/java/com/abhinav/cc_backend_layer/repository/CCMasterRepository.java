@@ -20,6 +20,6 @@ public interface CCMasterRepository extends JpaRepository<CCMaster, CCMasterKey>
 	@Query(value = "select CAST(SUBSTR(STMTMONTHYEAR,0,2) as INTEGER) as mm, SUBSTR(STMTMONTHYEAR,3,6) as yyyy, SUM(CAST(TOTALAMT as INTEGER)) as amount from  CC_MASTER_TEST group by mm,yyyy order by mm", nativeQuery = true)
 	List<AmountPerMonth> getAmountPerMonth();
 
-	@Query(value = "select c2.name, SUM(CAST(c1.TOTALAMT as INTEGER)) as amount from  CC_MASTER_TEST c1, CC_MASTER_NAMES c2 where c1.code=c2.code group by c2.name", nativeQuery = true)
-	List<AmountPerMonth> getAmountPerCard();
+	@Query(value = "select c2.name, SUM(CAST(c1.TOTALAMT as INTEGER)) as amount from  CC_MASTER_TEST c1, CC_MASTER_NAMES c2 where c1.code=c2.code and substring(c1.STMTMONTHYEAR,3,7)= ? group by c2.name", nativeQuery = true)
+	List<AmountPerMonth> getAmountPerCard(String year);
 }

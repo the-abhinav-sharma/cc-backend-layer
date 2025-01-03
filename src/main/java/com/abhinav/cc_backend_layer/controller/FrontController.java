@@ -104,9 +104,9 @@ public class FrontController {
 		return ccMasterService.getAmountPerMonth();
 	}
 	
-	@GetMapping("/cardlyTotal")
-	public List<AmountPerMonth> cardlyTotal() {
-		return ccMasterService.getAmountPerCard();
+	@GetMapping("/cardlyTotal/{year}")
+	public List<AmountPerMonth> cardlyTotal(@PathVariable String year) {
+		return ccMasterService.getAmountPerCard(year);
 	}
 	
 	@GetMapping("/cardNames")

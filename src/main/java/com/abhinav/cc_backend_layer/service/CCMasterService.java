@@ -75,7 +75,7 @@ public class CCMasterService {
 		return ccMasterRepository.getAmountPerMonth();
 	}
 	
-	public List<AmountPerMonth> getAmountPerCard() {
-		return ccMasterRepository.getAmountPerCard();
+	public List<AmountPerMonth> getAmountPerCard(String year) {
+		return ccMasterRepository.getAmountPerCard(year);
 	}
 }
