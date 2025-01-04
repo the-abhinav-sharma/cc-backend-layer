@@ -28,7 +28,11 @@ public class CCMasterService {
 	public Map<String, String> codeNames = new TreeMap<>();
 	
 	public CCMaster create(CCMaster ccMaster) {
-		ccMaster.setCreatedOn(new Timestamp(System.currentTimeMillis()));
+		if (ccMaster.getCreatedOn() == null || ccMaster.getCreatedOn().equals("")) {
+			ccMaster.setCreatedOn(new Timestamp(System.currentTimeMillis()));
+		} else {
+			ccMaster.setModifiedOn(new Timestamp(System.currentTimeMillis()));
+		}
 		return ccMasterRepository.saveAndFlush(ccMaster);
 	}
 
