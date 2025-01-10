@@ -99,9 +99,9 @@ public class FrontController {
 		}
 	}
 	
-	@GetMapping("/monthlyTotal")
-	public List<AmountPerMonth> monthlyTotal() {
-		return ccMasterService.getAmountPerMonth();
+	@GetMapping("/monthlyTotal/{year}")
+	public List<AmountPerMonth> monthlyTotal(@PathVariable String year) {
+		return ccMasterService.getAmountPerMonth(year);
 	}
 	
 	@GetMapping("/cardlyTotal/{year}")
