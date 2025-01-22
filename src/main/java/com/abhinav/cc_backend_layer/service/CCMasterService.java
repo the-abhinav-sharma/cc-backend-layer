@@ -82,4 +82,8 @@ public class CCMasterService {
 	public List<AmountPerMonth> getAmountPerCard(String year) {
 		return ccMasterRepository.getAmountPerCard(year);
 	}
+	
+	public List<CCMaster> getPendingPayments() {
+		return updateListWithNames(ccMasterRepository.findByCurrentStatusNot("Paid"));
+	}
 }

@@ -4,7 +4,10 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.imageio.ImageIO;
@@ -113,5 +116,28 @@ public class FrontController {
 	public Map<String, String> loadCardNames() {
 		return ccMasterService.codeNames;
 	}
-
+	
+	@GetMapping("/pending")
+	public String getPendingPayments() {
+		StringBuffer sb = new StringBuffer();
+		sb.append("********************************************************");
+		sb.append(System.lineSeparator());
+		sb.append("\t\t\tPending Payment Report");
+		sb.append(System.lineSeparator());
+		sb.append("********************************************************");
+		sb.append(System.lineSeparator());
+		sb.append(String.format("%30s %13s %6s", "Card Name |", "Due Date   |", "Total Amount"));  
+		sb.append(System.lineSeparator());
+		sb.append("--------------------------------------------------------");
+		sb.append(System.lineSeparator());
+		
+		for(CCMaster ccMaster : ccMasterService.getPendingPayments()) {
+			sb.append(String.format("%30s %11s %6s", ccMaster.getName()+" |", new SimpleDateFormat("dd-MMM-yyyy").format(ccMaster.getDueDate())+" |", NumberFormat.getCurrencyInstance(new Locale("en", "IN")).format(ccMaster.getTotalAmt())+""));
+			sb.append(System.lineSeparator());
+			sb.append("--------------------------------------------------------");
+			sb.append(System.lineSeparator());
+		}
+		System.out.println(sb.toString());
+		return sb.toString();
+	}
 }
