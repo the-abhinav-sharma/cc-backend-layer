@@ -14,6 +14,7 @@ import com.abhinav.cc_backend_layer.model.CCMaster;
 import com.abhinav.cc_backend_layer.model.CCMasterKey;
 import com.abhinav.cc_backend_layer.model.CCMasterNames;
 import com.abhinav.cc_backend_layer.repository.CCMasterNamesRepository;
+import com.abhinav.cc_backend_layer.repository.CCMasterNotificationsRepository;
 import com.abhinav.cc_backend_layer.repository.CCMasterRepository;
 
 @Service
@@ -24,6 +25,9 @@ public class CCMasterService {
 
 	@Autowired
 	CCMasterNamesRepository ccMasterNamesRepository;
+	
+	@Autowired
+	CCMasterNotificationsRepository ccMasterNotificationsRepository;
 
 	public Map<String, String> codeNames = new TreeMap<>();
 	
