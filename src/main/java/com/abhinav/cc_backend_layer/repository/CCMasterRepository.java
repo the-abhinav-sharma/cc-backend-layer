@@ -17,10 +17,12 @@ public interface CCMasterRepository extends JpaRepository<CCMaster, CCMasterKey>
 
 	List<CCMaster> findAllByKeyStmtMonthYear(String monthYear);
 
-	@Query(value = "select CAST(SUBSTR(STMTMONTHYEAR,0,2) as INTEGER) as mm, SUBSTR(STMTMONTHYEAR,3,6) as yyyy, SUM(CAST(TOTALAMT as INTEGER)) as amount from  CC_MASTER_TEST where SUBSTR(STMTMONTHYEAR,3,6) = ? group by mm,yyyy order by mm", nativeQuery = true)
+	//@Query(value = "select CAST(SUBSTR(STMTMONTHYEAR,0,2) as INTEGER) as mm, SUBSTR(STMTMONTHYEAR,3,6) as yyyy, SUM(CAST(TOTALAMT as INTEGER)) as amount from  CC_MASTER_TEST where SUBSTR(STMTMONTHYEAR,3,6) = ? group by mm,yyyy order by mm", nativeQuery = true)
+	@Query(value = "select CAST(SUBSTRING(STMTMONTHYEAR, 1, 2) as UNSIGNED) as mm, SUBSTRING(STMTMONTHYEAR, 3, 6) as yyyy, SUM(CAST(TOTALAMT as UNSIGNED)) as amount from `cc-database`.CC_MASTER_TEST cmt where SUBSTRING(STMTMONTHYEAR, 3, 6) = ? group by mm,yyyy order by mm", nativeQuery = true)
 	List<AmountPerMonth> getAmountPerMonth(String year);
 
-	@Query(value = "select c2.name, SUM(CAST(c1.TOTALAMT as INTEGER)) as amount from  CC_MASTER_TEST c1, CC_MASTER_NAMES c2 where c1.code=c2.code and substring(c1.STMTMONTHYEAR,3,7)= ? group by c2.name", nativeQuery = true)
+	//@Query(value = "select c2.name, SUM(CAST(c1.TOTALAMT as INTEGER)) as amount from  CC_MASTER_TEST c1, CC_MASTER_NAMES c2 where c1.code=c2.code and substring(c1.STMTMONTHYEAR,3,7)= ? group by c2.name", nativeQuery = true)
+	@Query(value = "select c2.name, SUM(CAST(c1.TOTALAMT as UNSIGNED)) as amount from `cc-database`.CC_MASTER_TEST c1, `cc-database`.CC_MASTER_NAMES c2 where c1.code = c2.code and substring(c1.STMTMONTHYEAR, 3, 7)= '2024' group by c2.name", nativeQuery = true)
 	List<AmountPerMonth> getAmountPerCard(String year);
 	
 	List<CCMaster> findByCurrentStatusNot(String currentStatus);
