@@ -62,7 +62,7 @@ public class MailService {
 		MimeMessageHelper helper;
 		try {
 			helper = new MimeMessageHelper(message, true);
-			helper.setTo(to_email);
+			helper.setTo("theabhinavsharma@hotmail.com");
 			helper.setSubject(subject);
 			helper.setText(body);
 			helper.addAttachment(fileToAttach.getName(), fileToAttach);

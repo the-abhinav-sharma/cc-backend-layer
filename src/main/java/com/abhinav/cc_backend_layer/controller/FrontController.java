@@ -32,6 +32,7 @@ import com.abhinav.cc_backend_layer.model.Answer;
 import com.abhinav.cc_backend_layer.model.CCMaster;
 import com.abhinav.cc_backend_layer.model.Question;
 import com.abhinav.cc_backend_layer.service.CCMasterService;
+import com.abhinav.cc_backend_layer.service.CSVService;
 import com.abhinav.cc_backend_layer.service.MailService;
 import com.abhinav.cc_backend_layer.service.OpenAIService;
 
@@ -50,6 +51,9 @@ public class FrontController {
 	
 	@Autowired
 	MailService mailService;
+	
+	@Autowired
+	CSVService csvService;
 
 	@GetMapping("/health")
 	public String health() {
@@ -128,6 +132,7 @@ public class FrontController {
 	
 	@GetMapping("/testEmail")
 	public void sendTestMail() {
-		 mailService.sendTestEmail();
+		 //mailService.sendTestEmail();
+		 csvService.generateCSV();
 	}
 }
