@@ -32,6 +32,7 @@ import com.abhinav.cc_backend_layer.model.Answer;
 import com.abhinav.cc_backend_layer.model.CCMaster;
 import com.abhinav.cc_backend_layer.model.Question;
 import com.abhinav.cc_backend_layer.service.CCMasterService;
+import com.abhinav.cc_backend_layer.service.MailService;
 import com.abhinav.cc_backend_layer.service.OpenAIService;
 
 @RestController
@@ -46,6 +47,9 @@ public class FrontController {
 	
 	@Autowired
 	OpenAiImageModel openAiImageModel;
+	
+	@Autowired
+	MailService mailService;
 
 	@GetMapping("/health")
 	public String health() {
@@ -119,25 +123,11 @@ public class FrontController {
 	
 	@GetMapping("/pending")
 	public String getPendingPayments() {
-		StringBuffer sb = new StringBuffer();
-		sb.append("********************************************************");
-		sb.append(System.lineSeparator());
-		sb.append("\t\t\tPending Payment Report");
-		sb.append(System.lineSeparator());
-		sb.append("********************************************************");
-		sb.append(System.lineSeparator());
-		sb.append(String.format("%30s %13s %6s", "Card Name |", "Due Date   |", "Total Amount"));  
-		sb.append(System.lineSeparator());
-		sb.append("--------------------------------------------------------");
-		sb.append(System.lineSeparator());
-		
-		for(CCMaster ccMaster : ccMasterService.getPendingPayments()) {
-			sb.append(String.format("%30s %11s %6s", ccMaster.getName()+" |", new SimpleDateFormat("dd-MMM-yyyy").format(ccMaster.getDueDate())+" |", NumberFormat.getCurrencyInstance(new Locale("en", "IN")).format(ccMaster.getTotalAmt())+""));
-			sb.append(System.lineSeparator());
-			sb.append("--------------------------------------------------------");
-			sb.append(System.lineSeparator());
-		}
-		System.out.println(sb.toString());
-		return sb.toString();
+		return ccMasterService.getPendingPayments();
+	}
+	
+	@GetMapping("/testEmail")
+	public void sendTestMail() {
+		 mailService.sendTestEmail();
 	}
 }

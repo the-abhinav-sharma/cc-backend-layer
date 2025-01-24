@@ -8,7 +8,7 @@ import com.abhinav.cc_backend_layer.service.CCMasterService;
 import jakarta.annotation.PostConstruct;
 
 @Component
-public class LoadNamesOnStartup {
+public class LoadOnStartup {
 
 	@Autowired
 	CCMasterService ccMasterService;
@@ -16,5 +16,6 @@ public class LoadNamesOnStartup {
 	@PostConstruct
 	public void init() {
 		ccMasterService.loadCardNames();
+		ccMasterService.getPendingPayments();
 	}
 }
