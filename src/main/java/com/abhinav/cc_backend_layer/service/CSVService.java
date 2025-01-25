@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -19,17 +20,17 @@ import com.opencsv.bean.StatefulBeanToCsvBuilder;
 import com.opencsv.exceptions.CsvDataTypeMismatchException;
 import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
 
-@Component
-public class CSVService {
+import lombok.extern.slf4j.Slf4j;
 
-	@Autowired
-	CCMasterService ccMasterService;
+@Component
+@Slf4j
+public class CSVService {
 
 	@Autowired
 	MailService mailService;
 
-	public int generateCSV() {
-		Iterator<CCMaster> it = getAll();
+	public boolean generateCSV(List<CCMaster> masterList) {
+		Iterator<CCMaster> it = masterList.iterator();
 		String finalPath = "CC_" + getDateTimeToday() + ".csv";
 		File file = new File(finalPath);
 		BufferedWriter writer = null;
@@ -58,30 +59,20 @@ public class CSVService {
 				beanToCsv.write(ccMasterCSV);
 			}
 		} catch (CsvDataTypeMismatchException | CsvRequiredFieldEmptyException | IOException ex) {
-			System.out.println(ex.getStackTrace().toString());
-			return 1;
+			log.info(ex.getStackTrace().toString());
+			return false;
 		} finally {
 			try {
 				writer.close();
 				fr.close();
 				mailService.sendMailWithAttachment("CC Data Backup!", "Backup taken at " + new Date(), file);
 				file.delete();
-				return 0;
+				return true;
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
-		return 0;
-	}
-
-	public Iterator<CCMaster> getAll() {
-		return ccMasterService.getAll().iterator();
-	}
-	
-	public static String getDateToday() {
-		SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
-		return dateFormat.format(new Date());
+		return false;
 	}
 
 	public static String getDateTimeToday() {

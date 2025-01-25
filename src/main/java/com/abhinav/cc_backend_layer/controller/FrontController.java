@@ -4,10 +4,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import javax.imageio.ImageIO;
@@ -128,11 +125,5 @@ public class FrontController {
 	@GetMapping("/pending")
 	public String getPendingPayments() {
 		return ccMasterService.getPendingPayments();
-	}
-	
-	@GetMapping("/testEmail")
-	public void sendTestMail() {
-		 //mailService.sendTestEmail();
-		 csvService.generateCSV();
 	}
 }
