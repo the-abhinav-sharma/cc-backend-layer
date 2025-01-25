@@ -16,6 +16,6 @@ public class LoadOnStartup {
 	@PostConstruct
 	public void init() {
 		ccMasterService.loadCardNames();
-		ccMasterService.getPendingPayments();
+		ccMasterService.sendNotifications();
 	}
 }

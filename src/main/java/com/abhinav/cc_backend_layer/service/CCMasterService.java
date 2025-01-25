@@ -1,11 +1,13 @@
 package com.abhinav.cc_backend_layer.service;
 
+import java.sql.Date;
 import java.sql.Timestamp;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
@@ -16,11 +18,15 @@ import com.abhinav.cc_backend_layer.model.AmountPerMonth;
 import com.abhinav.cc_backend_layer.model.CCMaster;
 import com.abhinav.cc_backend_layer.model.CCMasterKey;
 import com.abhinav.cc_backend_layer.model.CCMasterNames;
+import com.abhinav.cc_backend_layer.model.CCMasterNotifications;
 import com.abhinav.cc_backend_layer.repository.CCMasterNamesRepository;
 import com.abhinav.cc_backend_layer.repository.CCMasterNotificationsRepository;
 import com.abhinav.cc_backend_layer.repository.CCMasterRepository;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Service
+@Slf4j
 public class CCMasterService {
 
 	@Autowired
@@ -111,7 +117,27 @@ public class CCMasterService {
 			sb.append("--------------------------------------------------------");
 			sb.append(System.lineSeparator());
 		}
-		//System.out.println(sb.toString());
+		log.info(sb.toString());
 		return sb.toString();
+	}
+	
+	public void sendNotifications(){
+		Optional<CCMasterNotifications> notify = ccMasterNotificationsRepository.findById(new SimpleDateFormat("yyyy-MM-dd").format(new java.util.Date()));
+		if(notify.isPresent()) {
+			CCMasterNotifications ccMasterNotify= notify.get();
+			if(!ccMasterNotify.isFlag()) {
+				ccMasterNotify.setContent(getPendingPayments());
+				ccMasterNotify.setFlag(true);
+				ccMasterNotificationsRepository.save(ccMasterNotify);	
+				log.info("Flag updated for "+new Date(new java.util.Date().getTime()).toString()+" record in Notifications table");
+			}
+		}else {
+			CCMasterNotifications ccMasterNotify = new CCMasterNotifications();
+			ccMasterNotify.setDate(new SimpleDateFormat("yyyy-MM-dd").format(new java.util.Date()));
+			ccMasterNotify.setFlag(true);
+			ccMasterNotify.setContent(getPendingPayments());
+			ccMasterNotificationsRepository.save(ccMasterNotify);
+			log.info("New record inserted in Notifications table");
+		}
 	}
 }
