@@ -65,10 +65,10 @@ public class FrontController {
 	@PostMapping(path = "/image", produces = MediaType.IMAGE_PNG_VALUE)
 	public byte[] getImage(@RequestBody Question question) throws IOException {
 		 ImageOptions options = ImageOptionsBuilder.builder()
-	                .withModel("dall-e-3")
-                    .withN(1)
-                    .withHeight(1024)
-                    .withWidth(1024).withResponseFormat("b64_json")
+	                .model("dall-e-3")
+                    .N(1)
+                    .height(1024)
+                    .width(1024).responseFormat("b64_json")
 	                .build();
 	        ImagePrompt imagePrompt = new ImagePrompt(question.question(), options);
 	        ImageResponse response = openAiImageModel.call(imagePrompt);

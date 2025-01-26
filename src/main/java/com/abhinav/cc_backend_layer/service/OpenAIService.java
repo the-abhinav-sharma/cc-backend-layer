@@ -35,13 +35,13 @@ public class OpenAIService {
 				+ " milliseconds");
 
 		aiMasterRepository.save(AIMaster.builder().prompt(question.question())
-				.answer(response.getResult().getOutput().getContent()).timeIn(String.valueOf(startTime))
+				.answer(response.getResult().getOutput().getText()).timeIn(String.valueOf(startTime))
 				.timeOut(String.valueOf(stopTime))
 				.respTime(
 						TimeUnit.MILLISECONDS.convert(stopTime.getTime() - startTime.getTime(), TimeUnit.MILLISECONDS))
 				.build());
 
-		return new Answer(response.getResult().getOutput().getContent());
+		return new Answer(response.getResult().getOutput().getText());
 	}
 
 }
