@@ -123,6 +123,7 @@
 				</configuration>
 			</plugin>
 		</plugins>
+		<finalName>cc-backend</finalName>
 	</build>
 	<repositories>
 		<repository>
