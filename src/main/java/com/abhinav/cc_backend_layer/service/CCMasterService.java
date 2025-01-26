@@ -58,7 +58,6 @@ public class CCMasterService {
 			Optional<CCMasterNotifications> notify = getNotificationObject();
 			notify.get().setFlag(false);
 			ccMasterNotificationsRepository.save(notify.get());
-			sendNotifications();
 		}).start();
 		
 		return ccMaster;
