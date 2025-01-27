@@ -56,8 +56,12 @@ public class CCMasterService {
 		
 		new Thread(() -> {
 			Optional<CCMasterNotifications> notify = getNotificationObject();
-			notify.get().setFlag(false);
-			ccMasterNotificationsRepository.save(notify.get());
+			if (notify.isEmpty()) {
+				createNotifyRecord(null, false);
+			} else {
+				notify.get().setFlag(false);
+				ccMasterNotificationsRepository.save(notify.get());
+			}
 		}).start();
 		
 		return ccMaster;
@@ -151,15 +155,19 @@ public class CCMasterService {
 			}
 		}else {
 			if (mailService.sendEmail(emailBody) && csvService.generateCSV(ccMasterRepository.findAll())) {
-				CCMasterNotifications ccMasterNotify = new CCMasterNotifications();
-				ccMasterNotify.setDate(new SimpleDateFormat("yyyy-MM-dd").format(new java.util.Date()));
-				ccMasterNotify.setFlag(true);
-				ccMasterNotify.setContent(emailBody);
-				ccMasterNotificationsRepository.save(ccMasterNotify);
+				createNotifyRecord(emailBody, true);
 				log.info(emailBody);
-				log.info("New record inserted in Notifications table");
 			}
 		}
+	}
+
+	private void createNotifyRecord(String content, boolean flag) {
+		CCMasterNotifications ccMasterNotify = new CCMasterNotifications();
+		ccMasterNotify.setDate(new SimpleDateFormat("yyyy-MM-dd").format(new java.util.Date()));
+		ccMasterNotify.setFlag(flag);
+		ccMasterNotify.setContent(content);
+		ccMasterNotificationsRepository.save(ccMasterNotify);
+		log.info("New record inserted in Notifications table");
 	}
 
 	private Optional<CCMasterNotifications> getNotificationObject() {
