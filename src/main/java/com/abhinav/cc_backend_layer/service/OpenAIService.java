@@ -1,7 +1,9 @@
 package com.abhinav.cc_backend_layer.service;
 
-import java.util.Date;
-import java.util.concurrent.TimeUnit;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatResponse;
@@ -27,18 +29,25 @@ public class OpenAIService {
 	}
 
 	public Answer getAnswer(Question question) {
-		Date startTime = new Date();
+		ZoneId asiaKolkata = ZoneId.of("Asia/Kolkata");
+		ZonedDateTime startTime = ZonedDateTime.ofInstant(Instant.now(), asiaKolkata);
 		ChatResponse response = chatClient.prompt().user(question.question()).call().chatResponse();
-		Date stopTime = new Date();
+		ZonedDateTime stopTime = ZonedDateTime.ofInstant(Instant.now(), asiaKolkata);
+		long timeTaken = Duration.between(startTime, stopTime).toMillis();
 		log.info("For prompt: " + question.question() + ", response took: "
-				+ TimeUnit.MILLISECONDS.convert(stopTime.getTime() - startTime.getTime(), TimeUnit.MILLISECONDS)
+				+ timeTaken
 				+ " milliseconds");
 
+		String respText = response.getResult().getOutput().getText();
+		
+		if(respText.length()>1000) {
+			respText = respText.substring(0, 1000);
+		}
+		
 		aiMasterRepository.save(AIMaster.builder().prompt(question.question())
-				.answer(response.getResult().getOutput().getText()).timeIn(String.valueOf(startTime))
+				.answer(respText).timeIn(String.valueOf(startTime))
 				.timeOut(String.valueOf(stopTime))
-				.respTime(
-						TimeUnit.MILLISECONDS.convert(stopTime.getTime() - startTime.getTime(), TimeUnit.MILLISECONDS))
+				.respTime(timeTaken)
 				.build());
 
 		return new Answer(response.getResult().getOutput().getText());
