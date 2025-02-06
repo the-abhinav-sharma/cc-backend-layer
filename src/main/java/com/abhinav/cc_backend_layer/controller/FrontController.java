@@ -82,7 +82,6 @@ public class FrontController {
             return baos.toByteArray();
 	}
 
-
 	@GetMapping("/get")
 	public List<CCMaster> get() {
 		return ccMasterService.getAll();

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import com.abhinav.cc_backend_layer.model.CCMaster;
 import com.abhinav.cc_backend_layer.model.CCMasterKey;
 import com.abhinav.cc_backend_layer.service.CCMasterService;
+import com.abhinav.cc_backend_layer.service.OpenAIService;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -20,10 +21,18 @@ public class ScheduledTasks {
 
 	@Autowired
 	CCMasterService ccMasterService;
+	
+	@Autowired
+	OpenAIService openAIService;
 
 	@Scheduled(cron = "0 30 23 * * *", zone = "Asia/Kolkata")
 	public void execute() {
 		ccMasterService.sendNotifications();
+	}
+	
+	@Scheduled(cron = "0 55 23 * * *", zone = "Asia/Kolkata")
+	public void promptNotify() {
+		openAIService.getPromptsByDate();
 	}
 
 	@Scheduled(cron = "0 0 23 1 * *", zone = "Asia/Kolkata")

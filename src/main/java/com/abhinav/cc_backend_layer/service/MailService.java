@@ -19,12 +19,12 @@ public class MailService {
 	@Autowired
 	private JavaMailSender javaMailSender;
 	
-	public boolean sendEmail(String body) {		
+	public boolean sendEmail(String subject, String body) {		
 		try {
 			SimpleMailMessage msg = new SimpleMailMessage();
 			msg.setFrom("info@cc-dashboard.com");
 			msg.setTo("abhinav.sharma@hotmail.com");
-			msg.setSubject("Pending Payments Report");
+			msg.setSubject(subject);
 			msg.setText(body);
 
 			javaMailSender.send(msg);

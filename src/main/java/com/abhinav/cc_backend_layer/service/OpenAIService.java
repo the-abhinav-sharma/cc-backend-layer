@@ -1,9 +1,11 @@
 package com.abhinav.cc_backend_layer.service;
 
+import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.List;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatResponse;
@@ -22,10 +24,12 @@ public class OpenAIService {
 
 	private ChatClient chatClient;
 	private AIMasterRepository aiMasterRepository;
+	private MailService mailService;
 
-	public OpenAIService(ChatClient.Builder chatClientBuilder, AIMasterRepository aiMasterRepository) {
+	public OpenAIService(ChatClient.Builder chatClientBuilder, AIMasterRepository aiMasterRepository, MailService mailService) {
 		this.chatClient = chatClientBuilder.build();
 		this.aiMasterRepository = aiMasterRepository;
+		this.mailService = mailService;
 	}
 
 	public Answer getAnswer(Question question) {
@@ -51,6 +55,26 @@ public class OpenAIService {
 				.build());
 
 		return new Answer(response.getResult().getOutput().getText());
+	}
+	
+	public void getPromptsByDate() {
+		String date = new SimpleDateFormat("yyyy-MM-dd").format(new java.util.Date());
+		mailService.sendEmail("Daily Prompts Report - "+new SimpleDateFormat("dd-MMM-yyyy").format(new java.util.Date()), getPromptsMailBody(
+				aiMasterRepository.findBytimeInContains(date).stream().map(ai -> ">> " + ai.getPrompt()).toList()));
+	}
+	
+	public String getPromptsMailBody(List<String> list) {
+		StringBuffer sb = new StringBuffer();
+		for (String prompt : list) {
+			sb.append(prompt);
+			sb.append(System.lineSeparator());
+		}
+		
+		if(sb.length()==0) {
+			sb.append("No prompts for today");
+		}
+			
+		return sb.toString();
 	}
 
 }

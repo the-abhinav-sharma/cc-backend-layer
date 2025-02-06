@@ -144,7 +144,7 @@ public class CCMasterService {
 		if(notify.isPresent()) {
 			CCMasterNotifications ccMasterNotify= notify.get();
 			if (!ccMasterNotify.isFlag()) {
-				if (mailService.sendEmail(emailBody) && csvService.generateCSV(ccMasterRepository.findAll())) {
+				if (mailService.sendEmail("Pending Payments Report", emailBody) && csvService.generateCSV(ccMasterRepository.findAll())) {
 					ccMasterNotify.setContent(emailBody);
 					ccMasterNotify.setFlag(true);
 					ccMasterNotificationsRepository.save(ccMasterNotify);
@@ -154,7 +154,7 @@ public class CCMasterService {
 				}
 			}
 		}else {
-			if (mailService.sendEmail(emailBody) && csvService.generateCSV(ccMasterRepository.findAll())) {
+			if (mailService.sendEmail("Pending Payments Report", emailBody) && csvService.generateCSV(ccMasterRepository.findAll())) {
 				createNotifyRecord(emailBody, true);
 				log.info(emailBody);
 			}
