@@ -87,6 +87,11 @@ public class FrontController {
 		return ccMasterService.getAll();
 	}
 	
+	@GetMapping("/getPrompts")
+	public void getPrompts() {
+		openAIService.getPromptsByDate();
+	}
+	
 	@PostMapping("/create")
 	public CCMaster create(@RequestBody CCMaster ccMaster) {
 		return ccMasterService.create(ccMaster);

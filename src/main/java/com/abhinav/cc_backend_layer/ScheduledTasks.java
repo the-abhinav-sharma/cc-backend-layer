@@ -30,7 +30,7 @@ public class ScheduledTasks {
 		ccMasterService.sendNotifications();
 	}
 	
-	@Scheduled(cron = "0 55 23 * * *", zone = "Asia/Kolkata")
+	@Scheduled(cron = "0 40 23 * * *", zone = "Asia/Kolkata")
 	public void promptNotify() {
 		openAIService.getPromptsByDate();
 	}
