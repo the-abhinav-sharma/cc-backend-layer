@@ -54,7 +54,7 @@ public class FrontController {
 
 	@GetMapping("/health")
 	public String health() {
-		return "CC Backend Spring Boot is up and running";
+		return "CC Backend Spring Boot App is up and running";
 	}
 	
 	@PostMapping(path = "/ask", consumes = "application/json", produces = "application/json")
