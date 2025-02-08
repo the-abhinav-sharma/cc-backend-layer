@@ -22,7 +22,7 @@ public interface CCMasterRepository extends JpaRepository<CCMaster, CCMasterKey>
 	List<AmountPerMonth> getAmountPerMonth(String year);
 
 	//@Query(value = "select c2.name, SUM(CAST(c1.TOTALAMT as INTEGER)) as amount from  CC_MASTER_TEST c1, CC_MASTER_NAMES c2 where c1.code=c2.code and substring(c1.STMTMONTHYEAR,3,7)= ? group by c2.name", nativeQuery = true)
-	@Query(value = "select c2.name, SUM(CAST(c1.TOTALAMT as UNSIGNED)) as amount from `cc-database`.CC_MASTER_TEST c1, `cc-database`.CC_MASTER_NAMES c2 where c1.code = c2.code and substring(c1.STMTMONTHYEAR, 3, 7)= ? and c2.name <> 'PNB Car Loan' group by c2.name", nativeQuery = true)
+	@Query(value = "select c2.name, SUM(CAST(c1.TOTALAMT as UNSIGNED)) as amount from `cc-database`.CC_MASTER_TEST c1, `cc-database`.CC_MASTER_NAMES c2 where c1.code = c2.code and substring(c1.STMTMONTHYEAR, 3, 7)= ? and c2.name <> 'PNB Car Loan' group by c2.name order by c2.name", nativeQuery = true)
 	List<AmountPerMonth> getAmountPerCard(String year);
 	
 	List<CCMaster> findByCurrentStatusNot(String currentStatus);
