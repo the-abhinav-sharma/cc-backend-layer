@@ -28,8 +28,11 @@ import com.abhinav.cc_backend_layer.model.AmountPerMonth;
 import com.abhinav.cc_backend_layer.model.Answer;
 import com.abhinav.cc_backend_layer.model.CCMaster;
 import com.abhinav.cc_backend_layer.model.Question;
+import com.abhinav.cc_backend_layer.model.UserSession;
+import com.abhinav.cc_backend_layer.model.Users;
 import com.abhinav.cc_backend_layer.service.CCMasterService;
 import com.abhinav.cc_backend_layer.service.CSVService;
+import com.abhinav.cc_backend_layer.service.LoginService;
 import com.abhinav.cc_backend_layer.service.MailService;
 import com.abhinav.cc_backend_layer.service.OpenAIService;
 
@@ -51,6 +54,9 @@ public class FrontController {
 	
 	@Autowired
 	CSVService csvService;
+	
+	@Autowired
+	LoginService loginService;
 
 	@GetMapping("/health")
 	public String health() {
@@ -129,5 +135,16 @@ public class FrontController {
 	@GetMapping("/pending")
 	public String getPendingPayments() {
 		return ccMasterService.getPendingPayments();
+	}
+	
+	@PostMapping("/login")
+	public UserSession login(@RequestBody Users users) {
+		return loginService.login(users);
+	}
+	
+	@PostMapping("/logout")
+	public boolean logout(@RequestBody Users users) {
+		loginService.logout(users.getUsername());
+		return true;
 	}
 }
