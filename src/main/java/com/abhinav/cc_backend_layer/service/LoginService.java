@@ -1,6 +1,8 @@
 package com.abhinav.cc_backend_layer.service;
 
 import java.sql.Timestamp;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -29,7 +31,7 @@ public class LoginService {
 			UserSession session = new UserSession();
 			session.setUsername(usersOP.get().getUsername());
 			session.setToken(UUID.randomUUID().toString().replace("-", ""));
-			session.setLogintime(new Timestamp(System.currentTimeMillis()));
+			session.setLogintime(Timestamp.from(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toInstant()));
 			session.setActive(true);
 			return userSessionRepository.save(session);
 		}
@@ -39,7 +41,7 @@ public class LoginService {
 	public void logout(String username) {
 		UserSession session = userSessionRepository.findTopByUsernameOrderBySessionidDesc(username);
 		if (session != null && session.isActive()) {
-			session.setLogofftime(new Timestamp(System.currentTimeMillis()));
+			session.setLogofftime(Timestamp.from(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toInstant()));
 			session.setActive(false);
 			userSessionRepository.save(session);
 		}
