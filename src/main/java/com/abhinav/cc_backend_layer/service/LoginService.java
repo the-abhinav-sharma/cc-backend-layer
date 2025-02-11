@@ -1,9 +1,10 @@
 package com.abhinav.cc_backend_layer.service;
 
 import java.sql.Timestamp;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Optional;
+import java.util.TimeZone;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +32,7 @@ public class LoginService {
 			UserSession session = new UserSession();
 			session.setUsername(usersOP.get().getUsername());
 			session.setToken(UUID.randomUUID().toString().replace("-", ""));
-			session.setLogintime(Timestamp.from(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toInstant()));
+			session.setLogintime(getCurrentTimestamp());
 			session.setActive(true);
 			return userSessionRepository.save(session);
 		}
@@ -41,10 +42,16 @@ public class LoginService {
 	public void logout(String username) {
 		UserSession session = userSessionRepository.findTopByUsernameOrderBySessionidDesc(username);
 		if (session != null && session.isActive()) {
-			session.setLogofftime(Timestamp.from(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toInstant()));
+			session.setLogofftime(getCurrentTimestamp());
 			session.setActive(false);
 			userSessionRepository.save(session);
 		}
+	}
+
+	public Timestamp getCurrentTimestamp() {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		sdf.setTimeZone(TimeZone.getTimeZone("Asia/Kolkata"));
+		return Timestamp.valueOf(sdf.format(new Date()));
 	}
 
 }
