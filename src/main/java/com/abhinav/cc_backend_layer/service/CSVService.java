@@ -8,6 +8,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.TimeZone;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -31,7 +32,7 @@ public class CSVService {
 
 	public boolean generateCSV(List<CCMaster> masterList) {
 		Iterator<CCMaster> it = masterList.iterator();
-		String finalPath = "CC_" + getDateTimeToday() + ".csv";
+		String finalPath = "CC_" + getCurrentTimestamp("ddMMyyyy_HHmmss") + ".csv";
 		File file = new File(finalPath);
 		BufferedWriter writer = null;
 		FileWriter fr = null;
@@ -65,7 +66,7 @@ public class CSVService {
 			try {
 				writer.close();
 				fr.close();
-				mailService.sendMailWithAttachment("CC Data Backup!", "Backup taken at " + new Date(), file);
+				mailService.sendMailWithAttachment("CC Data Backup!", "Backup taken at " + getCurrentTimestamp("dd-MM-yyyy HH:mm:ss"), file);
 				file.delete();
 				return true;
 			} catch (IOException e) {
@@ -74,10 +75,11 @@ public class CSVService {
 		}
 		return false;
 	}
-
-	public static String getDateTimeToday() {
-		SimpleDateFormat dateFormat = new SimpleDateFormat("ddMMyyyy_HHmmss");
-		return dateFormat.format(new Date());
+	
+	public String getCurrentTimestamp(String dateFormat) {
+		SimpleDateFormat sdf = new SimpleDateFormat(dateFormat);
+		sdf.setTimeZone(TimeZone.getTimeZone("Asia/Kolkata"));
+		return sdf.format(new Date());
 	}
 
 }
