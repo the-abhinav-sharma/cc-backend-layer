@@ -53,5 +53,13 @@ public class LoginService {
 		sdf.setTimeZone(TimeZone.getTimeZone("Asia/Kolkata"));
 		return Timestamp.valueOf(sdf.format(new Date()));
 	}
+	
+	public boolean isValidToken(String token) {
+		UserSession session = userSessionRepository.findFirstByOrderBySessionidDesc();
+		if(session.isActive()) {
+			return token.equals(session.getToken());
+		}
+		return false;
+	}
 
 }

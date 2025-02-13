@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.abhinav.cc_backend_layer.model.AmountPerMonth;
@@ -118,7 +119,10 @@ public class FrontController {
 	}
 	
 	@GetMapping("/monthlyTotal/{year}")
-	public List<AmountPerMonth> monthlyTotal(@PathVariable String year) {
+	public List<AmountPerMonth> monthlyTotal(@PathVariable String year,@RequestHeader("Authorization") String authHeader) {
+        if(!checkAuthToken(authHeader)) {
+        	return null;
+        }
 		return ccMasterService.getAmountPerMonth(year);
 	}
 	
@@ -146,5 +150,12 @@ public class FrontController {
 	public boolean logout(@RequestBody Users users) {
 		loginService.logout(users.getUsername());
 		return true;
+	}
+	
+	private boolean checkAuthToken(String authHeader) {
+		if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+			return false;
+		}
+		return loginService.isValidToken(authHeader.substring(7));
 	}
 }
