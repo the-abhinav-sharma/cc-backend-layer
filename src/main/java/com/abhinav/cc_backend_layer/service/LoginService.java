@@ -28,13 +28,25 @@ public class LoginService {
 		logout(users.getUsername());
 		String passwordFromUI = users.getPassword();
 		Optional<Users> usersOP = userRepository.findById(users.getUsername());
-		if (usersOP.isPresent() && usersOP.get().getPassword().equals(passwordFromUI)) {
-			UserSession session = new UserSession();
-			session.setUsername(usersOP.get().getUsername());
-			session.setToken(UUID.randomUUID().toString().replace("-", ""));
-			session.setLogintime(getCurrentTimestamp());
-			session.setActive(true);
-			return userSessionRepository.save(session);
+		if (usersOP.isPresent()) {
+			Users user = usersOP.get();
+			if (usersOP.get().isEnabled() && usersOP.get().getPassword().equals(passwordFromUI)) {
+				UserSession session = new UserSession();
+				session.setUsername(usersOP.get().getUsername());
+				session.setToken(UUID.randomUUID().toString().replace("-", ""));
+				session.setLogintime(getCurrentTimestamp());
+				session.setActive(true);
+				user.setRetries(0);
+				return userSessionRepository.save(session);
+			}else {
+				if (user.getRetries() < 3) {
+					user.setRetries(user.getRetries() + 1);
+				}else {
+					user.setEnabled(false);
+					user.setRetries(99);
+				}
+			}
+			userRepository.save(user);
 		}
 		return null;
 	}

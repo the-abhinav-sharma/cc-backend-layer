@@ -10,4 +10,6 @@ public class Users {
 	@Id
 	private String username;
 	private String password;
+	private boolean enabled;
+	private Integer retries;
 }
