@@ -90,27 +90,40 @@ public class FrontController {
 	}
 
 	@GetMapping("/get")
-	public List<CCMaster> get() {
+	public List<CCMaster> get(@RequestHeader("Authorization") String authHeader) {
+		if(!checkAuthToken(authHeader)) {
+        	return null;
+        }
 		return ccMasterService.getAll();
 	}
 	
-	@GetMapping("/getPrompts")
+	//@GetMapping("/getPrompts")
 	public void getPrompts() {
 		openAIService.getPromptsByDate();
 	}
 	
 	@PostMapping("/create")
-	public CCMaster create(@RequestBody CCMaster ccMaster) {
+	public CCMaster create(@RequestBody CCMaster ccMaster, @RequestHeader("Authorization") String authHeader) {
+		if(!checkAuthToken(authHeader)) {
+        	return null;
+        }
 		return ccMasterService.create(ccMaster);
 	}
 
 	@GetMapping("/get/{code}/{monthYear}")
-	public CCMaster getByCodeAndMonthYear(@PathVariable String code, @PathVariable String monthYear) {
+	public CCMaster getByCodeAndMonthYear(@PathVariable String code, @PathVariable String monthYear, @RequestHeader("Authorization") String authHeader) {
+		if(!checkAuthToken(authHeader)) {
+        	return null;
+        }
 		return ccMasterService.getByPrimaryKey(code, monthYear);
 	}
 
 	@GetMapping("/get/{param}")
-	public List<CCMaster> getByCodeAndMonthYear(@PathVariable String param) {
+	public List<CCMaster> getByCodeAndMonthYear(@PathVariable String param, @RequestHeader("Authorization") String authHeader) {
+		if(!checkAuthToken(authHeader)) {
+        	return null;
+        }
+		
 		if (param.length() == 6) {
 			return ccMasterService.getByMonthYear(param);
 		} else {
@@ -119,7 +132,7 @@ public class FrontController {
 	}
 	
 	@GetMapping("/monthlyTotal/{year}")
-	public List<AmountPerMonth> monthlyTotal(@PathVariable String year,@RequestHeader("Authorization") String authHeader) {
+	public List<AmountPerMonth> monthlyTotal(@PathVariable String year, @RequestHeader("Authorization") String authHeader) {
         if(!checkAuthToken(authHeader)) {
         	return null;
         }
@@ -127,16 +140,19 @@ public class FrontController {
 	}
 	
 	@GetMapping("/cardlyTotal/{year}")
-	public List<AmountPerMonth> cardlyTotal(@PathVariable String year) {
+	public List<AmountPerMonth> cardlyTotal(@PathVariable String year, @RequestHeader("Authorization") String authHeader) {
+		if(!checkAuthToken(authHeader)) {
+        	return null;
+        }
 		return ccMasterService.getAmountPerCard(year);
 	}
 	
-	@GetMapping("/cardNames")
+	//@GetMapping("/cardNames")
 	public Map<String, String> loadCardNames() {
 		return ccMasterService.codeNames;
 	}
 	
-	@GetMapping("/pending")
+	//@GetMapping("/pending")
 	public String getPendingPayments() {
 		return ccMasterService.getPendingPayments();
 	}
