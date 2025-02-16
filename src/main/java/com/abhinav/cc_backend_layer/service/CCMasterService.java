@@ -4,6 +4,7 @@ import java.sql.Date;
 import java.sql.Timestamp;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -68,7 +69,7 @@ public class CCMasterService {
 	}
 
 	public List<CCMaster> getAll() {
-		return updateListWithNames(ccMasterRepository.findAll());
+		return sortListByDueDate(updateListWithNames(ccMasterRepository.findAll()));
 	}
 
 	public CCMaster getByPrimaryKey(String code, String monthYear) {
@@ -172,5 +173,9 @@ public class CCMasterService {
 
 	private Optional<CCMasterNotifications> getNotificationObject() {
 		return ccMasterNotificationsRepository.findById(new SimpleDateFormat("yyyy-MM-dd").format(new java.util.Date()));
+	}
+	
+	private List<CCMaster> sortListByDueDate(List<CCMaster> list) {
+		return list.stream().sorted(Comparator.comparing(CCMaster::getDueDate)).collect(Collectors.toList());
 	}
 }
