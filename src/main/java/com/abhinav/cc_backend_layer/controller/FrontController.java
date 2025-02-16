@@ -147,8 +147,11 @@ public class FrontController {
 		return ccMasterService.getAmountPerCard(year);
 	}
 	
-	//@GetMapping("/cardNames")
-	public Map<String, String> loadCardNames() {
+	@GetMapping("/cardNames")
+	public Map<String, String> loadCardNames(@RequestHeader("Authorization") String authHeader) {
+		if(!checkAuthToken(authHeader)) {
+        	return null;
+        }
 		return ccMasterService.codeNames;
 	}
 	
