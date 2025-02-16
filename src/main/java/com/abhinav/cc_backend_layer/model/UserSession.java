@@ -8,10 +8,17 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Transient;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Entity(name = "CC_USERS_SESSION")
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserSession {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,4 +32,6 @@ public class UserSession {
 	private Timestamp logofftime;
 	@JsonIgnore
 	private boolean active;
+	@Transient
+	private String error;
 }

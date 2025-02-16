@@ -27,28 +27,29 @@ public class LoginService {
 	public UserSession login(Users users) {
 		logout(users.getUsername());
 		String passwordFromUI = users.getPassword();
+		boolean enabled = true;
 		Optional<Users> usersOP = userRepository.findById(users.getUsername());
 		if (usersOP.isPresent()) {
 			Users user = usersOP.get();
 			if (usersOP.get().isEnabled() && usersOP.get().getPassword().equals(passwordFromUI)) {
-				UserSession session = new UserSession();
-				session.setUsername(usersOP.get().getUsername());
-				session.setToken(UUID.randomUUID().toString().replace("-", ""));
-				session.setLogintime(getCurrentTimestamp());
-				session.setActive(true);
+				UserSession session = UserSession.builder().username(usersOP.get().getUsername())
+						.token(UUID.randomUUID().toString().replace("-", "")).logintime(getCurrentTimestamp())
+						.active(true).build();
+
 				user.setRetries(0);
 				return userSessionRepository.save(session);
-			}else {
+			} else {
 				if (user.getRetries() < 3) {
 					user.setRetries(user.getRetries() + 1);
-				}else {
+				} else {
 					user.setEnabled(false);
+					enabled = false;
 					user.setRetries(99);
 				}
 			}
 			userRepository.save(user);
 		}
-		return null;
+		return UserSession.builder().error(!enabled ? "User is disabled" : "Oops! Invalid Credentials").build();
 	}
 
 	public void logout(String username) {
