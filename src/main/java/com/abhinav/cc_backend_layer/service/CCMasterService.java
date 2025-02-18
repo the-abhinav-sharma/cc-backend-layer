@@ -128,7 +128,7 @@ public class CCMasterService {
 		sb.append("--------------------------------------------------------");
 		sb.append(System.lineSeparator());
 
-		for (CCMaster ccMaster : updateListWithNames(ccMasterRepository.findByCurrentStatusNot("Paid"))) {
+		for (CCMaster ccMaster : sortListByDueDate(updateListWithNames(ccMasterRepository.findByCurrentStatusNot("Paid")))) {
 			sb.append(String.format("%30s %11s %6s", ccMaster.getName() + " |",
 					new SimpleDateFormat("dd-MMM-yyyy").format(ccMaster.getDueDate()) + " |",
 					NumberFormat.getCurrencyInstance(new Locale("en", "IN")).format(ccMaster.getTotalAmt()) + ""));
