@@ -39,10 +39,10 @@ public class ScheduledTasks {
 		ccMasterService.dataBackup();
 	}
 	
-	@Scheduled(cron = "0 40 23 * * *", zone = "Asia/Kolkata")
-	public void promptNotify() {
-		openAIService.getPromptsByDate();
-	}
+//	@Scheduled(cron = "0 40 23 * * *", zone = "Asia/Kolkata")
+//	public void promptNotify() {
+//		openAIService.getPromptsByDate();
+//	}
 
 	@Scheduled(cron = "0 0 23 1 * *", zone = "Asia/Kolkata")
 	public void insertOnFirstEveryMonth() {
