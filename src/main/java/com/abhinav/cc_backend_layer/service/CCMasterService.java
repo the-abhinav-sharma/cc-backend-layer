@@ -35,18 +35,18 @@ public class CCMasterService {
 
 	@Autowired
 	CCMasterNamesRepository ccMasterNamesRepository;
-	
+
 	@Autowired
 	CCMasterNotificationsRepository ccMasterNotificationsRepository;
-	
+
 	@Autowired
 	MailService mailService;
-	
+
 	@Autowired
 	CSVService csvService;
 
 	public Map<String, String> codeNames = new TreeMap<>();
-	
+
 	public CCMaster create(CCMaster ccMaster) {
 		if (ccMaster.getCreatedOn() == null || ccMaster.getCreatedOn().equals("")) {
 			ccMaster.setCreatedOn(new Timestamp(System.currentTimeMillis()));
@@ -54,7 +54,7 @@ public class CCMasterService {
 			ccMaster.setModifiedOn(new Timestamp(System.currentTimeMillis()));
 		}
 		ccMaster = ccMasterRepository.saveAndFlush(ccMaster);
-		
+
 		new Thread(() -> {
 			Optional<CCMasterNotifications> notify = getNotificationObject();
 			if (notify.isEmpty()) {
@@ -63,8 +63,9 @@ public class CCMasterService {
 				notify.get().setFlag(false);
 				ccMasterNotificationsRepository.save(notify.get());
 			}
+			sendNotifications(); //Temp solution. To be removed later.
 		}).start();
-		
+
 		return ccMaster;
 	}
 
@@ -106,15 +107,15 @@ public class CCMasterService {
 		}
 		return ccMaster;
 	}
-	
+
 	public List<AmountPerMonth> getAmountPerMonth(String year) {
 		return ccMasterRepository.getAmountPerMonth(year);
 	}
-	
+
 	public List<AmountPerMonth> getAmountPerCard(String year) {
 		return ccMasterRepository.getAmountPerCard(year);
 	}
-	
+
 	public String getPendingPayments() {
 		StringBuffer sb = new StringBuffer();
 		sb.append("********************************************************");
@@ -128,7 +129,8 @@ public class CCMasterService {
 		sb.append("--------------------------------------------------------");
 		sb.append(System.lineSeparator());
 
-		for (CCMaster ccMaster : sortListByDueDate(updateListWithNames(ccMasterRepository.findByCurrentStatusNot("Paid")))) {
+		for (CCMaster ccMaster : sortListByDueDate(
+				updateListWithNames(ccMasterRepository.findByCurrentStatusNot("Paid")))) {
 			sb.append(String.format("%30s %11s %6s", ccMaster.getName() + " |",
 					new SimpleDateFormat("dd-MMM-yyyy").format(ccMaster.getDueDate()) + " |",
 					NumberFormat.getCurrencyInstance(new Locale("en", "IN")).format(ccMaster.getTotalAmt()) + ""));
@@ -138,12 +140,12 @@ public class CCMasterService {
 		}
 		return sb.toString();
 	}
-	
-	public void sendNotifications(){
+
+	public void sendNotifications() {
 		String emailBody = getPendingPayments();
 		Optional<CCMasterNotifications> notify = getNotificationObject();
-		if(notify.isPresent()) {
-			CCMasterNotifications ccMasterNotify= notify.get();
+		if (notify.isPresent()) {
+			CCMasterNotifications ccMasterNotify = notify.get();
 			if (!ccMasterNotify.isFlag()) {
 				if (mailService.sendEmail("Pending Payments Report", emailBody)) {
 					ccMasterNotify.setContent(emailBody);
@@ -153,8 +155,11 @@ public class CCMasterService {
 					log.info("Flag updated for " + new Date(new java.util.Date().getTime()).toString()
 							+ " record in Notifications table");
 				}
+			} else {
+				log.info("Not sending notification email as its already sent for "
+						+ new Date(new java.util.Date().getTime()).toString() + " and there are no updates!");
 			}
-		}else {
+		} else {
 			if (mailService.sendEmail("Pending Payments Report", emailBody)) {
 				createNotifyRecord(emailBody, true);
 				log.info(emailBody);
@@ -172,13 +177,14 @@ public class CCMasterService {
 	}
 
 	private Optional<CCMasterNotifications> getNotificationObject() {
-		return ccMasterNotificationsRepository.findById(new SimpleDateFormat("yyyy-MM-dd").format(new java.util.Date()));
+		return ccMasterNotificationsRepository
+				.findById(new SimpleDateFormat("yyyy-MM-dd").format(new java.util.Date()));
 	}
-	
+
 	private List<CCMaster> sortListByDueDate(List<CCMaster> list) {
 		return list.stream().sorted(Comparator.comparing(CCMaster::getDueDate)).collect(Collectors.toList());
 	}
-	
+
 	public void dataBackup() {
 		csvService.generateCSV(ccMasterRepository.findAll());
 	}
