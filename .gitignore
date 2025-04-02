@@ -41,3 +41,6 @@ replay_pid*
 .project
 .classpath
 /target/
+/bin/
+*.sql
+*.jpg
