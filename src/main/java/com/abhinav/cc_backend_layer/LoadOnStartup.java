@@ -17,6 +17,6 @@ public class LoadOnStartup {
 	public void init() {
 		ccMasterService.loadCardNames();
 		ccMasterService.sendNotifications();
-		// ccMasterService.dataBackup();
+		//ccMasterService.dataBackup();
 	}
 }
