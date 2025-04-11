@@ -1,12 +1,9 @@
 package com.abhinav.cc_backend_layer.controller;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-//import org.springframework.ai.image.ImageOptionsBuilder;
-//import org.springframework.ai.image.ImagePrompt;
-//import org.springframework.ai.image.ImageResponse;
-//import org.springframework.ai.openai.OpenAiImageModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,8 +22,11 @@ import com.abhinav.cc_backend_layer.service.CSVService;
 import com.abhinav.cc_backend_layer.service.LoginService;
 import com.abhinav.cc_backend_layer.service.MailService;
 
+import lombok.extern.slf4j.Slf4j;
+
 @RestController
 @CrossOrigin
+@Slf4j
 public class FrontController {
 
 	@Autowired
@@ -43,8 +43,7 @@ public class FrontController {
 
 	@GetMapping("/health")
 	public String health() {
-		//ccMasterService.sendNotifications();
-		//ccMasterService.dataBackup();
+		log.info("Inside health - "+new Date());
 		return "CC Backend Spring Boot is up and running";
 	}
 
