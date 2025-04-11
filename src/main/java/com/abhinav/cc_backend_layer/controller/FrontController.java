@@ -43,8 +43,8 @@ public class FrontController {
 
 	@GetMapping("/health")
 	public String health() {
-		ccMasterService.sendNotifications();
-		ccMasterService.dataBackup();
+		//ccMasterService.sendNotifications();
+		//ccMasterService.dataBackup();
 		return "CC Backend Spring Boot is up and running";
 	}
 
