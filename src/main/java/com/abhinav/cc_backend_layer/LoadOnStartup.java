@@ -16,7 +16,7 @@ public class LoadOnStartup {
 	@PostConstruct
 	public void init() {
 		ccMasterService.loadCardNames();
-		ccMasterService.sendNotifications();
+		//ccMasterService.sendNotifications();
 		//ccMasterService.dataBackup();
 	}
 }

@@ -63,7 +63,6 @@ public class CCMasterService {
 				notify.get().setFlag(false);
 				ccMasterNotificationsRepository.save(notify.get());
 			}
-			sendNotifications(); //Temp solution. To be removed later.
 		}).start();
 
 		return ccMaster;
