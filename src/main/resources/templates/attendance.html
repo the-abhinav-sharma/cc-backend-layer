@@ -2,6 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <title>Attendance</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>
 	<h2>Mark Attendance</h2>
@@ -17,16 +18,24 @@
 			</tr>
 			<th:block th:each="emp, iterStat : *{employees}">
 				<tr>
-					<td><input style="text-align:center;" type="text" th:field="*{employees[__${iterStat.index}__].date}" readonly="readonly" /> </td>
-					<td><input type="checkbox" th:field="*{employees[__${iterStat.index}__].CM}" /> </td>
-					<td><input type="checkbox" th:field="*{employees[__${iterStat.index}__].CE}" /> </td>
-					<td><input type="checkbox" th:field="*{employees[__${iterStat.index}__].MM}" /> </td>
-					<td><input type="checkbox" th:field="*{employees[__${iterStat.index}__].ME}" /> </td>
-					<td><input type="checkbox" th:field="*{employees[__${iterStat.index}__].CW}" /> </td>
+					<td><input style="text-align: center;" type="text"
+						th:field="*{employees[__${iterStat.index}__].date}"
+						readonly="readonly" /></td>
+					<td><input type="checkbox"
+						th:field="*{employees[__${iterStat.index}__].CM}" /></td>
+					<td><input type="checkbox"
+						th:field="*{employees[__${iterStat.index}__].CE}" /></td>
+					<td><input type="checkbox"
+						th:field="*{employees[__${iterStat.index}__].MM}" /></td>
+					<td><input type="checkbox"
+						th:field="*{employees[__${iterStat.index}__].ME}" /></td>
+					<td><input type="checkbox"
+						th:field="*{employees[__${iterStat.index}__].CW}" /></td>
 				</tr>
 			</th:block>
-		</table><br/>
-		<button type="submit" >Submit</button>
+		</table>
+		<br />
+		<button type="submit">Submit</button>
 	</form>
 </body>
 </html>
