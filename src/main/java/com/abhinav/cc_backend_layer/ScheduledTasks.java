@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import com.abhinav.cc_backend_layer.model.CCMaster;
 import com.abhinav.cc_backend_layer.model.CCMasterKey;
+import com.abhinav.cc_backend_layer.model.EmployeeService;
 import com.abhinav.cc_backend_layer.service.CCMasterService;
 import com.abhinav.cc_backend_layer.service.CSVService;
 
@@ -24,10 +25,18 @@ public class ScheduledTasks {
 	
 	@Autowired
 	CSVService csvService;
+	
+	@Autowired
+	EmployeeService employeeService;
 
 	@Scheduled(cron = "0 30 23 * * *", zone = "Asia/Kolkata")
 	public void execute() {
 		ccMasterService.sendNotifications();
+	}
+	
+	@Scheduled(cron = "0 10 0 * * *", zone = "Asia/Kolkata")
+	public void insertDailyRecord() {
+		employeeService.insertDailyRecord();
 	}
 	
 	@Scheduled(cron = "0 35 23 * * 0", zone = "Asia/Kolkata")
