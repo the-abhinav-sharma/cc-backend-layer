@@ -10,6 +10,7 @@
 		<table border="1">
 			<tr>
 				<th>Date</th>
+				<th>Day</th>
 				<th>CM</th>
 				<th>CE</th>
 				<th>MM</th>
@@ -20,6 +21,9 @@
 				<tr>
 					<td><input style="text-align: center;" type="text"
 						th:field="*{employees[__${iterStat.index}__].date}"
+						readonly="readonly" /></td>
+					<td><input style="text-align: center;" type="text"
+						th:field="*{employees[__${iterStat.index}__].day}"
 						readonly="readonly" /></td>
 					<td><input type="checkbox"
 						th:field="*{employees[__${iterStat.index}__].CM}" /></td>

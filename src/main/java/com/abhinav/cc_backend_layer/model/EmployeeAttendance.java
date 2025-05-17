@@ -9,6 +9,7 @@ import lombok.Data;
 public class EmployeeAttendance {
 	@Id
 	private String date;
+	private String day;
 	private boolean CM;
 	private boolean CE;
 	private boolean MM;
