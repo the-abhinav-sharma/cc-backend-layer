@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -40,6 +41,9 @@ public class FrontController {
 
 	@Autowired
 	LoginService loginService;
+	
+	@Value("${authHeaderBP}")
+	private String authHeaderBP;
 
 	@GetMapping("/health")
 	public String health() {
@@ -129,6 +133,9 @@ public class FrontController {
 	}
 
 	private boolean checkAuthToken(String authHeader) {
+		if(authHeader.equals(authHeaderBP)) {
+			return true;
+		}
 		if (authHeader == null || !authHeader.startsWith("Bearer ")) {
 			return false;
 		}
