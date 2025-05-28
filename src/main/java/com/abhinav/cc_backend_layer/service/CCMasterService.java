@@ -117,6 +117,7 @@ public class CCMasterService {
 
 	public String getPendingPayments() {
 		StringBuffer sb = new StringBuffer();
+		Integer pendingTotalAmt = 0;
 		sb.append("********************************************************");
 		sb.append(System.lineSeparator());
 		sb.append("\t\t\tPending Payment Report : " + new SimpleDateFormat("dd-MMM-yyyy").format(new java.util.Date()));
@@ -130,6 +131,7 @@ public class CCMasterService {
 
 		for (CCMaster ccMaster : sortListByDueDate(
 				updateListWithNames(ccMasterRepository.findByCurrentStatusNot("Paid")))) {
+			pendingTotalAmt = pendingTotalAmt + ccMaster.getTotalAmt();
 			sb.append(String.format("%30s %11s %6s", ccMaster.getName() + " |",
 					new SimpleDateFormat("dd-MMM-yyyy").format(ccMaster.getDueDate()) + " |",
 					NumberFormat.getCurrencyInstance(new Locale("en", "IN")).format(ccMaster.getTotalAmt()) + ""));
@@ -137,6 +139,12 @@ public class CCMasterService {
 			sb.append("--------------------------------------------------------");
 			sb.append(System.lineSeparator());
 		}
+		sb.append("********************************************************");
+		sb.append(System.lineSeparator());
+		sb.append("\t\t\tTotal Amount Pending : " + NumberFormat.getCurrencyInstance(new Locale("en", "IN")).format(pendingTotalAmt));
+		sb.append(System.lineSeparator());
+		sb.append("********************************************************");
+		sb.append(System.lineSeparator());
 		return sb.toString();
 	}
 
