@@ -1,45 +1,84 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-<title>Attendance</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Attendance</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>
-	<h2>Mark Attendance</h2>
-	<form th:action="@{/attendance}" method="post" th:object="${employees}">
-		<table border="1">
-			<tr>
-				<th>Date</th>
-				<th>Day</th>
-				<th>CM</th>
-				<th>CE</th>
-				<th>MM</th>
-				<th>ME</th>
-				<th>CW</th>
-			</tr>
-			<th:block th:each="emp, iterStat : *{employees}">
-				<tr>
-					<td><input style="text-align: center;" type="text"
-						th:field="*{employees[__${iterStat.index}__].date}"
-						readonly="readonly" size="10"/></td>
-					<td><input style="text-align: center;" type="text"
-						th:field="*{employees[__${iterStat.index}__].day}"
-						readonly="readonly" size="10" /></td>
-					<td><input type="checkbox"
-						th:field="*{employees[__${iterStat.index}__].CM}" /></td>
-					<td><input type="checkbox"
-						th:field="*{employees[__${iterStat.index}__].CE}" /></td>
-					<td><input type="checkbox"
-						th:field="*{employees[__${iterStat.index}__].MM}" /></td>
-					<td><input type="checkbox"
-						th:field="*{employees[__${iterStat.index}__].ME}" /></td>
-					<td><input type="checkbox"
-						th:field="*{employees[__${iterStat.index}__].CW}" /></td>
-				</tr>
-			</th:block>
-		</table>
-		<br />
-		<button type="submit">Submit</button>
-	</form>
+<h2>Mark Attendance</h2>
+
+<form th:action="@{/attendance}" method="post" th:object="${employees}">
+
+    <!-- Current Month Table -->
+    <table border="1">
+        <caption><b>Current Month: <span th:text="${#dates.format(#dates.createNow(), 'MMMM yyyy')}"></span></b></caption>
+        <tr>
+            <th>Date</th>
+            <th>Day</th>
+            <th>CM</th>
+            <th>CE</th>
+            <th>MM</th>
+            <th>ME</th>
+            <th>CW</th>
+        </tr>
+
+        <th:block th:each="emp, iterStat : *{employees}">
+            <tr th:if="${emp.date != null and #dates.format(emp.date, 'MMMM yyyy') == #dates.format(#dates.createNow(), 'MMMM yyyy')}">
+                <td><input type="text" th:field="*{employees[__${iterStat.index}__].date}" readonly size="10" style="text-align: center;" /></td>
+                <td><input type="text" th:field="*{employees[__${iterStat.index}__].day}" readonly size="10" style="text-align: center;" /></td>
+                <td><input type="checkbox" th:field="*{employees[__${iterStat.index}__].CM}" /></td>
+                <td><input type="checkbox" th:field="*{employees[__${iterStat.index}__].CE}" /></td>
+                <td><input type="checkbox" th:field="*{employees[__${iterStat.index}__].MM}" /></td>
+                <td><input type="checkbox" th:field="*{employees[__${iterStat.index}__].ME}" /></td>
+                <td><input type="checkbox" th:field="*{employees[__${iterStat.index}__].CW}" /></td>
+            </tr>
+        </th:block>
+    </table>
+
+    <br/>
+
+    <!-- Other Months -->
+    <th:block th:with="printedMonths=${T(java.util.HashSet).newInstance()}">
+        <th:block th:each="emp, iterStat : *{employees}">
+            <th:block th:if="${emp.date != null}" th:with="month=${#dates.format(emp.date, 'MMMM yyyy')}">
+                <th:block th:if="${month != #dates.format(#dates.createNow(), 'MMMM yyyy') and !printedMonths.contains(month)}">
+                    <!-- Add this month to printedMonths -->
+                    <th:block th:with="added=${printedMonths.add(month)}" th:remove="tag"/>
+
+                    <br/><br/>
+                    <table border="1">
+                        <caption><b th:text="${month}"></b></caption>
+                        <tr>
+                            <th>Date</th>
+                            <th>Day</th>
+                            <th>CM</th>
+                            <th>CE</th>
+                            <th>MM</th>
+                            <th>ME</th>
+                            <th>CW</th>
+                        </tr>
+
+                        <th:block th:each="e, i : *{employees}">
+                            <th:block th:if="${#dates.format(e.date, 'MMMM yyyy') == month}">
+                                <tr>
+                                    <td><input type="text" th:field="*{employees[__${i.index}__].date}" readonly size="10" style="text-align: center;" /></td>
+                                    <td><input type="text" th:field="*{employees[__${i.index}__].day}" readonly size="10" style="text-align: center;" /></td>
+                                    <td><input type="checkbox" th:field="*{employees[__${i.index}__].CM}" /></td>
+                                    <td><input type="checkbox" th:field="*{employees[__${i.index}__].CE}" /></td>
+                                    <td><input type="checkbox" th:field="*{employees[__${i.index}__].MM}" /></td>
+                                    <td><input type="checkbox" th:field="*{employees[__${i.index}__].ME}" /></td>
+                                    <td><input type="checkbox" th:field="*{employees[__${i.index}__].CW}" /></td>
+                                </tr>
+                            </th:block>
+                        </th:block>
+                    </table>
+                </th:block>
+            </th:block>
+        </th:block>
+    </th:block>
+
+    <br/>
+    <button type="submit">Submit</button>
+</form>
 </body>
 </html>

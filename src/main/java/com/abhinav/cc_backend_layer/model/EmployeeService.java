@@ -1,6 +1,7 @@
 package com.abhinav.cc_backend_layer.model;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +31,7 @@ public class EmployeeService {
 	
 	public void insertDailyRecord() {
 		EmployeeAttendance empAtt = new EmployeeAttendance();
-		empAtt.setDate(new SimpleDateFormat("yyyy-MM-dd").format(new java.util.Date()));
+		empAtt.setDate(java.sql.Date.valueOf(LocalDate.now()));
 		empAtt.setDay(new SimpleDateFormat("EEEE").format(new java.util.Date()));
 		empAtt.setCM(false);
 		empAtt.setCE(false);

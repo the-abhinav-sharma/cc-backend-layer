@@ -1,5 +1,7 @@
 package com.abhinav.cc_backend_layer.model;
 
+import java.sql.Date;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import lombok.Data;
@@ -8,7 +10,7 @@ import lombok.Data;
 @Entity(name = "EMPLOYEE_ATTENDANCE")
 public class EmployeeAttendance {
 	@Id
-	private String date;
+	private Date date;
 	private String day;
 	private boolean CM;
 	private boolean CE;
