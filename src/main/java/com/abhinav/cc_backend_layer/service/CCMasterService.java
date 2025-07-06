@@ -118,15 +118,15 @@ public class CCMasterService {
 	public String getPendingPayments() {
 		StringBuffer sb = new StringBuffer();
 		Integer pendingTotalAmt = 0;
-		sb.append("********************************************************");
+		sb.append("******************************************************");
 		sb.append(System.lineSeparator());
 		sb.append("\t\t\tPending Payment Report : " + new SimpleDateFormat("dd-MMM-yyyy").format(new java.util.Date()));
 		sb.append(System.lineSeparator());
-		sb.append("********************************************************");
+		sb.append("******************************************************");
 		sb.append(System.lineSeparator());
 		sb.append(String.format("%30s %13s %6s", "Card Name |", "Due Date   |", "Total Amount"));
 		sb.append(System.lineSeparator());
-		sb.append("--------------------------------------------------------");
+		sb.append("------------------------------------------------------");
 		sb.append(System.lineSeparator());
 
 		for (CCMaster ccMaster : sortListByDueDate(
@@ -136,14 +136,14 @@ public class CCMasterService {
 					new SimpleDateFormat("dd-MMM-yyyy").format(ccMaster.getDueDate()) + " |",
 					NumberFormat.getCurrencyInstance(new Locale("en", "IN")).format(ccMaster.getTotalAmt()) + ""));
 			sb.append(System.lineSeparator());
-			sb.append("--------------------------------------------------------");
+			sb.append("------------------------------------------------------");
 			sb.append(System.lineSeparator());
 		}
-		sb.append("********************************************************");
+		sb.append("******************************************************");
 		sb.append(System.lineSeparator());
 		sb.append("\t\t\tTotal Amount Pending : " + NumberFormat.getCurrencyInstance(new Locale("en", "IN")).format(pendingTotalAmt));
 		sb.append(System.lineSeparator());
-		sb.append("********************************************************");
+		sb.append("******************************************************");
 		sb.append(System.lineSeparator());
 		return sb.toString();
 	}
