@@ -20,9 +20,11 @@ import com.abhinav.cc_backend_layer.model.CCMaster;
 import com.abhinav.cc_backend_layer.model.CCMasterKey;
 import com.abhinav.cc_backend_layer.model.CCMasterNames;
 import com.abhinav.cc_backend_layer.model.CCMasterNotifications;
+import com.abhinav.cc_backend_layer.model.Users;
 import com.abhinav.cc_backend_layer.repository.CCMasterNamesRepository;
 import com.abhinav.cc_backend_layer.repository.CCMasterNotificationsRepository;
 import com.abhinav.cc_backend_layer.repository.CCMasterRepository;
+import com.abhinav.cc_backend_layer.repository.UserRepository;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -44,6 +46,9 @@ public class CCMasterService {
 
 	@Autowired
 	CSVService csvService;
+
+	@Autowired
+	UserRepository userRepository;
 
 	public Map<String, String> codeNames = new TreeMap<>();
 
@@ -67,7 +72,7 @@ public class CCMasterService {
 
 		return ccMaster;
 	}
-	
+
 	public CCMaster create(CCMaster ccMaster, String username) {
 		if (ccMaster.getCreatedOn() == null || ccMaster.getCreatedOn().equals("")) {
 			ccMaster.setCreatedOn(new Timestamp(System.currentTimeMillis()));
@@ -93,7 +98,7 @@ public class CCMasterService {
 	public List<CCMaster> getAll() {
 		return sortListByDueDate(updateListWithNames(ccMasterRepository.findAll()));
 	}
-	
+
 	public List<CCMaster> getAll(String username) {
 		return sortListByDueDate(updateListWithNames(ccMasterRepository.findAllByUsername(username)));
 	}
@@ -104,7 +109,7 @@ public class CCMasterService {
 		key.setStmtMonthYear(monthYear);
 		return updateObjectWithName(ccMasterRepository.findById(key).orElse(null));
 	}
-	
+
 	public CCMaster getByPrimaryKey(String code, String monthYear, String username) {
 		CCMasterKey key = new CCMasterKey();
 		key.setCode(code);
@@ -124,17 +129,17 @@ public class CCMasterService {
 	public List<CCMaster> getByCode(String code) {
 		return updateListWithNames(ccMasterRepository.findAllByKeyCode(code));
 	}
-	
+
 	public List<CCMaster> getByCode(String code, String username) {
-		return updateListWithNames(ccMasterRepository.findAllByKeyCodeAndUsername(code,username));
+		return updateListWithNames(ccMasterRepository.findAllByKeyCodeAndUsername(code, username));
 	}
 
 	public List<CCMaster> getByMonthYear(String monthYear) {
 		return updateListWithNames(ccMasterRepository.findAllByKeyStmtMonthYear(monthYear));
 	}
-	
+
 	public List<CCMaster> getByMonthYear(String monthYear, String username) {
-		return updateListWithNames(ccMasterRepository.findAllByKeyStmtMonthYearAndUsername(monthYear,username));
+		return updateListWithNames(ccMasterRepository.findAllByKeyStmtMonthYearAndUsername(monthYear, username));
 	}
 
 	public void loadCardNames() {
@@ -160,8 +165,8 @@ public class CCMasterService {
 	public List<AmountPerMonth> getAmountPerMonth(String year) {
 		return ccMasterRepository.getAmountPerMonth(year);
 	}
-	
-	public List<AmountPerMonth> getAmountPerMonth(String year,String username) {
+
+	public List<AmountPerMonth> getAmountPerMonth(String year, String username) {
 		return ccMasterRepository.getAmountPerMonthByUser(year, username);
 	}
 
@@ -173,12 +178,12 @@ public class CCMasterService {
 		return ccMasterRepository.getAmountPerCardByUser(year, username);
 	}
 
-	public String getPendingPayments() {
+	public String getPendingPayments(String username) {
 		StringBuffer sb = new StringBuffer();
 		Integer pendingTotalAmt = 0;
 		sb.append("******************************************************");
 		sb.append(System.lineSeparator());
-		sb.append("\t\t\tPending Payment Report : " + new SimpleDateFormat("dd-MMM-yyyy").format(new java.util.Date()));
+		sb.append("\t\t\tReport Generated on " + new SimpleDateFormat("dd-MMM-yyyy").format(new java.util.Date()));
 		sb.append(System.lineSeparator());
 		sb.append("******************************************************");
 		sb.append(System.lineSeparator());
@@ -188,7 +193,7 @@ public class CCMasterService {
 		sb.append(System.lineSeparator());
 
 		for (CCMaster ccMaster : sortListByDueDate(
-				updateListWithNames(ccMasterRepository.findByCurrentStatusNot("Paid")))) {
+				updateListWithNames(ccMasterRepository.findByUsernameAndCurrentStatusNot(username, "Paid")))) {
 			pendingTotalAmt = pendingTotalAmt + ccMaster.getTotalAmt();
 			sb.append(String.format("%30s %11s %6s", ccMaster.getName() + " |",
 					new SimpleDateFormat("dd-MMM-yyyy").format(ccMaster.getDueDate()) + " |",
@@ -199,7 +204,8 @@ public class CCMasterService {
 		}
 		sb.append("******************************************************");
 		sb.append(System.lineSeparator());
-		sb.append("\t\t\tTotal Amount Pending : " + NumberFormat.getCurrencyInstance(new Locale("en", "IN")).format(pendingTotalAmt));
+		sb.append("\t\t\tTotal Amount Pending : "
+				+ NumberFormat.getCurrencyInstance(new Locale("en", "IN")).format(pendingTotalAmt));
 		sb.append(System.lineSeparator());
 		sb.append("******************************************************");
 		sb.append(System.lineSeparator());
@@ -207,28 +213,20 @@ public class CCMasterService {
 	}
 
 	public void sendNotifications() {
-		String emailBody = getPendingPayments();
-		Optional<CCMasterNotifications> notify = getNotificationObject();
-		if (notify.isPresent()) {
-			CCMasterNotifications ccMasterNotify = notify.get();
-			if (!ccMasterNotify.isFlag()) {
-				if (mailService.sendEmail("Pending Payments Report", emailBody)) {
-					ccMasterNotify.setContent(emailBody);
-					ccMasterNotify.setFlag(true);
-					ccMasterNotificationsRepository.save(ccMasterNotify);
-					log.info(emailBody);
-					log.info("Flag updated for " + new Date(new java.util.Date().getTime()).toString()
-							+ " record in Notifications table");
-				}
-			} else {
-				log.info("Not sending notification email as its already sent for "
-						+ new Date(new java.util.Date().getTime()).toString() + " and there are no updates!");
-			}
-		} else {
-			if (mailService.sendEmail("Pending Payments Report", emailBody)) {
-				createNotifyRecord(emailBody, true);
-				log.info(emailBody);
-			}
+		List<Users> users = userRepository.findAll();
+		for (Users user : users) {
+			new Thread(() -> {
+				sendMailToUser(user.getUsername(), user.getEmail());
+			}).start();
+		}
+	}
+
+	private void sendMailToUser(String username, String email) {
+		String emailBody = getPendingPayments(username);
+		if (mailService.sendEmail("Credit Card Pending Payments", emailBody, email)) {
+			log.info(emailBody);
+			log.info("Mail sent successfully for user:" + username + " to email:" + email + " at "
+					+ new java.util.Date());
 		}
 	}
 

@@ -36,6 +36,8 @@ public interface CCMasterRepository extends JpaRepository<CCMaster, CCMasterKey>
 	List<AmountPerMonth> getAmountPerCardByUser(String year, String username);
 	
 	List<CCMaster> findByCurrentStatusNot(String currentStatus);
+
+	List<CCMaster> findByUsernameAndCurrentStatusNot(String username, String currentStatus);
 	
 	List<CCMaster> findAllByUsername(String username);
 }

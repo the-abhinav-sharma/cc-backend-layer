@@ -12,4 +12,5 @@ public class Users {
 	private String password;
 	private boolean enabled;
 	private Integer retries;
+	private String email;
 }

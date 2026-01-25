@@ -126,9 +126,9 @@ public class FrontController {
 		return ccMasterService.codeNames;
 	}
 
-	// @GetMapping("/pending")
-	public String getPendingPayments() {
-		return ccMasterService.getPendingPayments();
+	@GetMapping("/notify")
+	public void sendNotifications() {
+		 ccMasterService.sendNotifications();
 	}
 
 	@PostMapping("/login")

@@ -19,11 +19,10 @@ public class MailService {
 	@Autowired
 	private JavaMailSender javaMailSender;
 	
-	public boolean sendEmail(String subject, String body) {		
+	public boolean sendEmail(String subject, String body, String email) {		
 		try {
 			SimpleMailMessage msg = new SimpleMailMessage();
-			msg.setFrom("info@cc-dashboard.com");
-			msg.setTo("abhinav.sharma@hotmail.com");
+			msg.setTo(email);
 			msg.setSubject(subject);
 			msg.setText(body);
 
