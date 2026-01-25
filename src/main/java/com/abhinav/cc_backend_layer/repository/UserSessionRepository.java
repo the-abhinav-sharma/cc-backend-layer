@@ -8,4 +8,5 @@ public interface UserSessionRepository extends JpaRepository<UserSession, Intege
 	
 	UserSession findTopByUsernameOrderBySessionidDesc(String username);
 	UserSession findFirstByOrderBySessionidDesc();
+	UserSession findAllByToken(String token);
 }

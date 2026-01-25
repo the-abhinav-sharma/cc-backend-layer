@@ -67,9 +67,35 @@ public class CCMasterService {
 
 		return ccMaster;
 	}
+	
+	public CCMaster create(CCMaster ccMaster, String username) {
+		if (ccMaster.getCreatedOn() == null || ccMaster.getCreatedOn().equals("")) {
+			ccMaster.setCreatedOn(new Timestamp(System.currentTimeMillis()));
+		} else {
+			ccMaster.setModifiedOn(new Timestamp(System.currentTimeMillis()));
+		}
+		ccMaster.setUsername(username);
+		ccMaster = ccMasterRepository.saveAndFlush(ccMaster);
+
+		new Thread(() -> {
+			Optional<CCMasterNotifications> notify = getNotificationObject();
+			if (notify.isEmpty()) {
+				createNotifyRecord(null, false);
+			} else {
+				notify.get().setFlag(false);
+				ccMasterNotificationsRepository.save(notify.get());
+			}
+		}).start();
+
+		return ccMaster;
+	}
 
 	public List<CCMaster> getAll() {
 		return sortListByDueDate(updateListWithNames(ccMasterRepository.findAll()));
+	}
+	
+	public List<CCMaster> getAll(String username) {
+		return sortListByDueDate(updateListWithNames(ccMasterRepository.findAllByUsername(username)));
 	}
 
 	public CCMaster getByPrimaryKey(String code, String monthYear) {
@@ -78,13 +104,37 @@ public class CCMasterService {
 		key.setStmtMonthYear(monthYear);
 		return updateObjectWithName(ccMasterRepository.findById(key).orElse(null));
 	}
+	
+	public CCMaster getByPrimaryKey(String code, String monthYear, String username) {
+		CCMasterKey key = new CCMasterKey();
+		key.setCode(code);
+		key.setStmtMonthYear(monthYear);
+
+		Optional<CCMaster> optCCMaster = ccMasterRepository.findById(key);
+		if (optCCMaster.isEmpty()) {
+			return null;
+		} else {
+			if (optCCMaster.get().getUsername().equalsIgnoreCase(username)) {
+				return updateObjectWithName(optCCMaster.get());// TBC
+			}
+		}
+		return null;
+	}
 
 	public List<CCMaster> getByCode(String code) {
 		return updateListWithNames(ccMasterRepository.findAllByKeyCode(code));
 	}
+	
+	public List<CCMaster> getByCode(String code, String username) {
+		return updateListWithNames(ccMasterRepository.findAllByKeyCodeAndUsername(code,username));
+	}
 
 	public List<CCMaster> getByMonthYear(String monthYear) {
 		return updateListWithNames(ccMasterRepository.findAllByKeyStmtMonthYear(monthYear));
+	}
+	
+	public List<CCMaster> getByMonthYear(String monthYear, String username) {
+		return updateListWithNames(ccMasterRepository.findAllByKeyStmtMonthYearAndUsername(monthYear,username));
 	}
 
 	public void loadCardNames() {
@@ -110,9 +160,17 @@ public class CCMasterService {
 	public List<AmountPerMonth> getAmountPerMonth(String year) {
 		return ccMasterRepository.getAmountPerMonth(year);
 	}
+	
+	public List<AmountPerMonth> getAmountPerMonth(String year,String username) {
+		return ccMasterRepository.getAmountPerMonthByUser(year, username);
+	}
 
 	public List<AmountPerMonth> getAmountPerCard(String year) {
 		return ccMasterRepository.getAmountPerCard(year);
+	}
+
+	public List<AmountPerMonth> getAmountPerCard(String year, String username) {
+		return ccMasterRepository.getAmountPerCardByUser(year, username);
 	}
 
 	public String getPendingPayments() {

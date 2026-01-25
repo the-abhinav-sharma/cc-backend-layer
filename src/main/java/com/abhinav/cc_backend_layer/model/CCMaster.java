@@ -24,4 +24,5 @@ public class CCMaster {
 	private String remarks;
 	private Timestamp createdOn;
 	private Timestamp modifiedOn;
+	private String username;
 }

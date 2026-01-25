@@ -14,16 +14,28 @@ import com.abhinav.cc_backend_layer.model.CCMasterKey;
 public interface CCMasterRepository extends JpaRepository<CCMaster, CCMasterKey> {
 
 	List<CCMaster> findAllByKeyCode(String code);
+	
+	List<CCMaster> findAllByKeyCodeAndUsername(String code, String username);
 
 	List<CCMaster> findAllByKeyStmtMonthYear(String monthYear);
+	
+	List<CCMaster> findAllByKeyStmtMonthYearAndUsername(String monthYear,String username);
 
 	//@Query(value = "select CAST(SUBSTR(STMTMONTHYEAR,0,2) as INTEGER) as mm, SUBSTR(STMTMONTHYEAR,3,6) as yyyy, SUM(CAST(TOTALAMT as INTEGER)) as amount from  CC_MASTER_TEST where SUBSTR(STMTMONTHYEAR,3,6) = ? group by mm,yyyy order by mm", nativeQuery = true)
 	@Query(value = "select CAST(SUBSTRING(STMTMONTHYEAR, 1, 2) as UNSIGNED) as mm, SUBSTRING(STMTMONTHYEAR, 3, 6) as yyyy, SUM(CAST(TOTALAMT as UNSIGNED)) as amount from `freedb_cc-database`.CC_MASTER_TEST cmt where SUBSTRING(STMTMONTHYEAR, 3, 6) = ? and cmt.CODE <> 'PNB02' group by mm,yyyy order by mm", nativeQuery = true)
 	List<AmountPerMonth> getAmountPerMonth(String year);
+	
+	@Query(value = "select CAST(SUBSTRING(STMTMONTHYEAR, 1, 2) as UNSIGNED) as mm, SUBSTRING(STMTMONTHYEAR, 3, 6) as yyyy, SUM(CAST(TOTALAMT as UNSIGNED)) as amount from `freedb_cc-database`.CC_MASTER_TEST cmt where SUBSTRING(STMTMONTHYEAR, 3, 6) = ? and cmt.CODE <> 'PNB02' and username = ? group by mm,yyyy order by mm", nativeQuery = true)
+	List<AmountPerMonth> getAmountPerMonthByUser(String year, String username);
 
 	//@Query(value = "select c2.name, SUM(CAST(c1.TOTALAMT as INTEGER)) as amount from  CC_MASTER_TEST c1, CC_MASTER_NAMES c2 where c1.code=c2.code and substring(c1.STMTMONTHYEAR,3,7)= ? group by c2.name", nativeQuery = true)
 	@Query(value = "select c2.name, SUM(CAST(c1.TOTALAMT as UNSIGNED)) as amount from `freedb_cc-database`.CC_MASTER_TEST c1, `freedb_cc-database`.CC_MASTER_NAMES c2 where c1.code = c2.code and substring(c1.STMTMONTHYEAR, 3, 7)= ? and c2.name <> 'PNB Car Loan' group by c2.name order by c2.name", nativeQuery = true)
 	List<AmountPerMonth> getAmountPerCard(String year);
 	
+	@Query(value = "select c2.name, SUM(CAST(c1.TOTALAMT as UNSIGNED)) as amount from `freedb_cc-database`.CC_MASTER_TEST c1, `freedb_cc-database`.CC_MASTER_NAMES c2 where c1.code = c2.code and substring(c1.STMTMONTHYEAR, 3, 7)= ? and c2.name <> 'PNB Car Loan' and username = ? group by c2.name order by c2.name", nativeQuery = true)
+	List<AmountPerMonth> getAmountPerCardByUser(String year, String username);
+	
 	List<CCMaster> findByCurrentStatusNot(String currentStatus);
+	
+	List<CCMaster> findAllByUsername(String username);
 }

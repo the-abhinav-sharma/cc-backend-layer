@@ -44,6 +44,9 @@ public class FrontController {
 	
 	@Value("${authHeaderBP}")
 	private String authHeaderBP;
+	
+	@Value("${authUserBP}")
+	private String authUserBP;
 
 	@GetMapping("/health")
 	public String health() {
@@ -53,64 +56,71 @@ public class FrontController {
 
 	@GetMapping("/get")
 	public List<CCMaster> get(@RequestHeader("Authorization") String authHeader) {
-		if (!checkAuthToken(authHeader)) {
+		String user = checkAuthToken(authHeader);
+		if (user == null) {
 			return null;
 		}
-		return ccMasterService.getAll();
+		return ccMasterService.getAll(user);
 	}
 
 	@PostMapping("/create")
 	public CCMaster create(@RequestBody CCMaster ccMaster, @RequestHeader("Authorization") String authHeader) {
-		if (!checkAuthToken(authHeader)) {
+		String user = checkAuthToken(authHeader);
+		if (user == null) {
 			return null;
 		}
-		return ccMasterService.create(ccMaster);
+		return ccMasterService.create(ccMaster, user);
 	}
 
 	@GetMapping("/get/{code}/{monthYear}")
 	public CCMaster getByCodeAndMonthYear(@PathVariable String code, @PathVariable String monthYear,
 			@RequestHeader("Authorization") String authHeader) {
-		if (!checkAuthToken(authHeader)) {
+		String user = checkAuthToken(authHeader);
+		if (user == null) {
 			return null;
 		}
-		return ccMasterService.getByPrimaryKey(code, monthYear);
+		return ccMasterService.getByPrimaryKey(code, monthYear, user);
 	}
 
 	@GetMapping("/get/{param}")
 	public List<CCMaster> getByCodeAndMonthYear(@PathVariable String param,
 			@RequestHeader("Authorization") String authHeader) {
-		if (!checkAuthToken(authHeader)) {
+		String user = checkAuthToken(authHeader);
+		if (user == null) {
 			return null;
 		}
 
 		if (param.length() == 6) {
-			return ccMasterService.getByMonthYear(param);
+			return ccMasterService.getByMonthYear(param, user);
 		} else {
-			return ccMasterService.getByCode(param);
+			return ccMasterService.getByCode(param, user);
 		}
 	}
 
 	@GetMapping("/monthlyTotal/{year}")
 	public List<AmountPerMonth> monthlyTotal(@PathVariable String year,
 			@RequestHeader("Authorization") String authHeader) {
-		if (!checkAuthToken(authHeader)) {
+		String user = checkAuthToken(authHeader);
+		if (user == null) {
 			return null;
 		}
-		return ccMasterService.getAmountPerMonth(year);
+		return ccMasterService.getAmountPerMonth(year, user);
 	}
 
 	@GetMapping("/cardlyTotal/{year}")
 	public List<AmountPerMonth> cardlyTotal(@PathVariable String year,
 			@RequestHeader("Authorization") String authHeader) {
-		if (!checkAuthToken(authHeader)) {
+		String user = checkAuthToken(authHeader);
+		if (user == null) {
 			return null;
 		}
-		return ccMasterService.getAmountPerCard(year);
+		return ccMasterService.getAmountPerCard(year, user);
 	}
 
 	@GetMapping("/cardNames")
 	public Map<String, String> loadCardNames(@RequestHeader("Authorization") String authHeader) {
-		if (!checkAuthToken(authHeader)) {
+		String user = checkAuthToken(authHeader);
+		if (user == null) {
 			return null;
 		}
 		return ccMasterService.codeNames;
@@ -132,12 +142,22 @@ public class FrontController {
 		return true;
 	}
 
-	private boolean checkAuthToken(String authHeader) {
+//	private boolean checkAuthTokenOld(String authHeader) {
+//		if(authHeader.equals(authHeaderBP)) {
+//			return true;
+//		}
+//		if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+//			return false;
+//		}
+//		return loginService.isValidToken(authHeader.substring(7));
+//	}
+	
+	private String checkAuthToken(String authHeader) {
 		if(authHeader.equals(authHeaderBP)) {
-			return true;
+			return authUserBP;
 		}
 		if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-			return false;
+			return null;
 		}
 		return loginService.isValidToken(authHeader.substring(7));
 	}

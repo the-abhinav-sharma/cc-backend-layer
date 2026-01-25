@@ -67,12 +67,20 @@ public class LoginService {
 		return Timestamp.valueOf(sdf.format(new Date()));
 	}
 	
-	public boolean isValidToken(String token) {
+	public boolean isValidTokenOld(String token) {
 		UserSession session = userSessionRepository.findFirstByOrderBySessionidDesc();
 		if(session.isActive()) {
 			return token.equals(session.getToken());
 		}
 		return false;
+	}
+	
+	public String isValidToken(String token) {
+		UserSession session = userSessionRepository.findAllByToken(token);
+		if (session.isActive() && token.equals(session.getToken())) {
+			return session.getUsername();
+		}
+		return null;
 	}
 
 }
