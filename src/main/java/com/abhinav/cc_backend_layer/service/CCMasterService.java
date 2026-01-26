@@ -209,6 +209,10 @@ public class CCMasterService {
 		sb.append(System.lineSeparator());
 		sb.append("******************************************************");
 		sb.append(System.lineSeparator());
+		
+		if(pendingTotalAmt == 0 ) {
+			return "No pending payments for you as of today. Thank you.";
+		}
 		return sb.toString();
 	}
 
