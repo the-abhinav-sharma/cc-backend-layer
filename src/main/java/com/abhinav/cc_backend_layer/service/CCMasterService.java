@@ -79,7 +79,7 @@ public class CCMasterService {
 		} else {
 			ccMaster.setModifiedOn(new Timestamp(System.currentTimeMillis()));
 		}
-		ccMaster.setUsername(username);
+		ccMaster.getKey().setUsername(username);
 		ccMaster = ccMasterRepository.saveAndFlush(ccMaster);
 
 		new Thread(() -> {
@@ -100,7 +100,7 @@ public class CCMasterService {
 	}
 
 	public List<CCMaster> getAll(String username) {
-		return sortListByDueDate(updateListWithNames(ccMasterRepository.findAllByUsername(username)));
+		return sortListByDueDate(updateListWithNames(ccMasterRepository.findAllByKeyUsername(username)));
 	}
 
 	public CCMaster getByPrimaryKey(String code, String monthYear) {
@@ -114,12 +114,13 @@ public class CCMasterService {
 		CCMasterKey key = new CCMasterKey();
 		key.setCode(code);
 		key.setStmtMonthYear(monthYear);
+		key.setUsername(username);
 
 		Optional<CCMaster> optCCMaster = ccMasterRepository.findById(key);
 		if (optCCMaster.isEmpty()) {
 			return null;
 		} else {
-			if (optCCMaster.get().getUsername().equalsIgnoreCase(username)) {
+			if (optCCMaster.get().getKey().getUsername().equalsIgnoreCase(username)) {
 				return updateObjectWithName(optCCMaster.get());// TBC
 			}
 		}

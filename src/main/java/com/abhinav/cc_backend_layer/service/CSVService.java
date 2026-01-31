@@ -46,6 +46,7 @@ public class CSVService {
 				CCMasterCSV ccMasterCSV = new CCMasterCSV();
 				ccMasterCSV.setCode(ccMaster.getKey().getCode());
 				ccMasterCSV.setStmtMonthYear(ccMaster.getKey().getStmtMonthYear());
+				ccMasterCSV.setUsername(ccMaster.getKey().getUsername());
 				ccMasterCSV.setName(ccMaster.getName());
 				ccMasterCSV.setMinAmt(ccMaster.getMinAmt());
 				ccMasterCSV.setTotalAmt(ccMaster.getTotalAmt());

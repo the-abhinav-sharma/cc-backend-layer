@@ -9,6 +9,7 @@ import lombok.Data;
 public class CCMasterCSV {
 	private String code;
 	private String stmtMonthYear;
+	private String username;
 	private String name;
 	private Integer minAmt;
 	private Integer totalAmt;

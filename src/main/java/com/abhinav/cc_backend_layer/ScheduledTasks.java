@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.TimeZone;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -19,6 +20,9 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 @Slf4j
 public class ScheduledTasks {
+	
+	@Value("${authUserBP}")
+	private String authUserBP;
 
 	@Autowired
 	CCMasterService ccMasterService;
@@ -50,6 +54,7 @@ public class ScheduledTasks {
 		CCMasterKey key = new CCMasterKey();
 		key.setCode("PNB02");
 		key.setStmtMonthYear(getStmtMonthYear());
+		key.setUsername(authUserBP);
 
 		ccMaster.setMinAmt(13000);
 		ccMaster.setTotalAmt(13000);
