@@ -3,7 +3,6 @@ package com.abhinav.cc_backend_layer.service;
 import java.io.File;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
@@ -21,12 +20,14 @@ public class MailService {
 	
 	public boolean sendEmail(String subject, String body, String email) {		
 		try {
-			SimpleMailMessage msg = new SimpleMailMessage();
-			msg.setTo(email);
-			msg.setSubject(subject);
-			msg.setText(body);
+			MimeMessage message = javaMailSender.createMimeMessage();
+			MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
-			javaMailSender.send(msg);
+			helper.setTo(email);
+			helper.setSubject(subject);
+			helper.setText(body, true);
+
+			javaMailSender.send(message);
 			log.info("Email Sent Successfully!!");
 			return true;
 		} catch (Exception e) {

@@ -4,6 +4,9 @@ import java.sql.Date;
 import java.sql.Timestamp;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
@@ -179,42 +182,151 @@ public class CCMasterService {
 		return ccMasterRepository.getAmountPerCardByUser(year, username);
 	}
 
-	public String getPendingPayments(String username) {
-		StringBuffer sb = new StringBuffer();
-		Integer pendingTotalAmt = 0;
-		sb.append("******************************************************");
-		sb.append(System.lineSeparator());
-		sb.append("\t\t\tReport Generated on " + new SimpleDateFormat("dd-MMM-yyyy").format(new java.util.Date()));
-		sb.append(System.lineSeparator());
-		sb.append("******************************************************");
-		sb.append(System.lineSeparator());
-		sb.append(String.format("%30s %13s %6s", "Card Name |", "Due Date   |", "Total Amount"));
-		sb.append(System.lineSeparator());
-		sb.append("------------------------------------------------------");
-		sb.append(System.lineSeparator());
+//	public String getPendingPayments(String username) {
+//		StringBuffer sb = new StringBuffer();
+//		Integer pendingTotalAmt = 0;
+//		sb.append("******************************************************");
+//		sb.append(System.lineSeparator());
+//		sb.append("\t\t\tReport Generated on " + new SimpleDateFormat("dd-MMM-yyyy").format(new java.util.Date()));
+//		sb.append(System.lineSeparator());
+//		sb.append("******************************************************");
+//		sb.append(System.lineSeparator());
+//		sb.append(String.format("%30s %13s %6s", "Card Name |", "Due Date   |", "Total Amount"));
+//		sb.append(System.lineSeparator());
+//		sb.append("------------------------------------------------------");
+//		sb.append(System.lineSeparator());
+//
+//		for (CCMaster ccMaster : sortListByDueDate(
+//				updateListWithNames(ccMasterRepository.findByUsernameAndCurrentStatusNot(username, "Paid")))) {
+//			pendingTotalAmt = pendingTotalAmt + ccMaster.getTotalAmt();
+//			sb.append(String.format("%30s %11s %6s", ccMaster.getName() + " |",
+//					new SimpleDateFormat("dd-MMM-yyyy").format(ccMaster.getDueDate()) + " |",
+//					NumberFormat.getCurrencyInstance(new Locale("en", "IN")).format(ccMaster.getTotalAmt()) + ""));
+//			sb.append(System.lineSeparator());
+//			sb.append("------------------------------------------------------");
+//			sb.append(System.lineSeparator());
+//		}
+//		sb.append("******************************************************");
+//		sb.append(System.lineSeparator());
+//		sb.append("\t\t\tTotal Amount Pending : "
+//				+ NumberFormat.getCurrencyInstance(new Locale("en", "IN")).format(pendingTotalAmt));
+//		sb.append(System.lineSeparator());
+//		sb.append("******************************************************");
+//		sb.append(System.lineSeparator());
+//		
+//		if(pendingTotalAmt == 0 ) {
+//			return "No pending payments for you as of today. Thank you.";
+//		}
+//		return sb.toString();
+//	}
 
-		for (CCMaster ccMaster : sortListByDueDate(
-				updateListWithNames(ccMasterRepository.findByUsernameAndCurrentStatusNot(username, "Paid")))) {
-			pendingTotalAmt = pendingTotalAmt + ccMaster.getTotalAmt();
-			sb.append(String.format("%30s %11s %6s", ccMaster.getName() + " |",
-					new SimpleDateFormat("dd-MMM-yyyy").format(ccMaster.getDueDate()) + " |",
-					NumberFormat.getCurrencyInstance(new Locale("en", "IN")).format(ccMaster.getTotalAmt()) + ""));
-			sb.append(System.lineSeparator());
-			sb.append("------------------------------------------------------");
-			sb.append(System.lineSeparator());
-		}
-		sb.append("******************************************************");
-		sb.append(System.lineSeparator());
-		sb.append("\t\t\tTotal Amount Pending : "
-				+ NumberFormat.getCurrencyInstance(new Locale("en", "IN")).format(pendingTotalAmt));
-		sb.append(System.lineSeparator());
-		sb.append("******************************************************");
-		sb.append(System.lineSeparator());
-		
-		if(pendingTotalAmt == 0 ) {
-			return "No pending payments for you as of today. Thank you.";
-		}
-		return sb.toString();
+	public String getPendingPayments(String username) {
+
+	    List<CCMaster> list = updateListWithNames(
+	            ccMasterRepository.findByUsernameAndCurrentStatusNot(username, "Paid")
+	    );
+
+	    if (list.isEmpty()) {
+	        return "<p style='font-family:Arial,sans-serif;font-size:16px;'>"
+	                + "No pending payments for you as of today. Thank you.</p>";
+	    }
+
+	    // Sort by urgency: earliest due first
+	    list.sort(Comparator.comparing(CCMaster::getDueDate));
+
+	    int pendingTotalAmt = 0;
+	    SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MMM-yyyy");
+	    NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(new Locale("en", "IN"));
+
+	    StringBuilder sb = new StringBuilder();
+
+	    sb.append("<html><head>");
+	    // CSS to force iOS/Outlook data detectors to inherit your text styles
+	    sb.append("<style>");
+	    sb.append("a[x-apple-data-detectors] { color: inherit !important; text-decoration: none !important; font-size: inherit !important; font-family: inherit !important; font-weight: inherit !important; line-height: inherit !important; }");
+	    sb.append("</style>");
+	    sb.append("</head>");
+	    
+	    sb.append("<body style='margin:0;padding:10px;font-family:Arial,sans-serif;'>");
+
+	    sb.append("<h2 style='text-align:center;margin-bottom:5px;'>Pending Payments</h2>");
+	    sb.append("<p style='text-align:center;font-size:14px;color:#555;margin-top:0;'>")
+	      .append("Report Generated on ").append(dateFormat.format(new java.util.Date()))
+	      .append("</p>");
+
+	    sb.append("<table width='100%' cellpadding='5' cellspacing='0' ")
+	      .append("style='border-collapse:collapse;border:1px solid #ddd;font-size:15px;'>");
+
+	    sb.append("<tr style='background-color:#f4f4f4;'>")
+	      .append("<th align='left' style='padding:8px;'>Card</th>")
+	      .append("<th align='left' style='padding:8px;'>Due Date</th>")
+	      .append("<th align='left' style='padding:8px;'>Status</th>")
+	      .append("<th align='right' style='padding:8px;'>Amount</th>")
+	      .append("</tr>");
+
+	    LocalDate today = LocalDate.now();
+
+	    for (CCMaster ccMaster : list) {
+	            if (ccMaster.getDueDate() == null || ccMaster.getTotalAmt() == null || ccMaster.getName() == null) {
+	                continue;
+	            }
+
+	            pendingTotalAmt += ccMaster.getTotalAmt();
+	            LocalDate dueDate = ccMaster.getDueDate().toLocalDate();
+	            long daysLeft = ChronoUnit.DAYS.between(today, dueDate);
+
+	            String statusText;
+	            String statusColor;
+
+	            if (daysLeft < 0) {
+	                statusText = "Overdue by " + Math.abs(daysLeft) + " days";
+	                statusColor = "#c62828";
+	            } else if (daysLeft == 0) {
+	                statusText = "Due today";
+	                statusColor = "#c62828";
+	            } else if (daysLeft <= 3) {
+	                statusText = "Due in " + daysLeft + " days";
+	                statusColor = "#ef6c00";
+	            } else {
+	                statusText = "Due in " + daysLeft + " days";
+	                statusColor = "#2e7d32";
+	            }
+
+	            // Neutralize status text for Outlook
+	            String neutralizedStatus = statusText.replace("Due", "Du&#8204;e").replace("days", "da&#8204;ys");
+
+	            sb.append("<tr>");
+	            sb.append("<td style='max-width:250px;word-wrap:break-word;padding:8px;'>").append(ccMaster.getName()).append("</td>");
+
+	            // Date Column
+	            String antiLinkDate = dateFormat.format(ccMaster.getDueDate()).replaceFirst("-", "-&#8204;");
+	            sb.append("<td style='white-space:nowrap;padding:8px;color:#333333;'><span style='color:#333333;text-decoration:none;'>")
+	              .append(antiLinkDate).append("</span></td>");
+
+	            // Status Column
+	            sb.append("<td style='padding:8px;'>")
+	              .append("<span style='color:").append(statusColor).append(";font-weight:bold;'>")
+	              .append("<font color='").append(statusColor).append("'>")
+	              .append(neutralizedStatus)
+	              .append("</font></span></td>");
+
+	            // Amount Column
+	            sb.append("<td align='right' style='font-weight:bold;padding:8px;'>").append(currencyFormat.format(ccMaster.getTotalAmt())).append("</td>");
+	            sb.append("</tr>");
+	    }
+
+	    // Total row
+	    sb.append("<tr style='background-color:#e8f5e9;font-weight:bold;'>")
+	      .append("<td colspan='3' align='right' style='padding:8px;'>Total Pending</td>")
+	      .append("<td align='right' style='color:#2e7d32;padding:8px;'>")
+	      .append(currencyFormat.format(pendingTotalAmt))
+	      .append("</td>")
+	      .append("</tr>");
+
+	    sb.append("</table>");
+	    sb.append("</body></html>");
+
+	    return sb.toString();
 	}
 
 	public void sendNotifications() {
