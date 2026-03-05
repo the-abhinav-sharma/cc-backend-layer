@@ -50,7 +50,7 @@ public class FrontController {
 
 	@GetMapping("/health")
 	public String health() {
-		log.info("Inside health - "+loginService.getCurrentTimestamp());
+		log.info("Inside health - "+loginService.getCurrentTimestamp()+". DB returned - "+ccMasterService.keepAlive());
 		return "CC Backend Spring Boot is up and running";
 	}
 

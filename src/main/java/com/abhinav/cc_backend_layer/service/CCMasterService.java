@@ -16,6 +16,7 @@ import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import com.abhinav.cc_backend_layer.model.AmountPerMonth;
@@ -52,6 +53,9 @@ public class CCMasterService {
 
 	@Autowired
 	UserRepository userRepository;
+	
+	@Autowired
+	JdbcTemplate jdbcTemplate;
 
 	public Map<String, String> codeNames = new TreeMap<>();
 
@@ -368,4 +372,8 @@ public class CCMasterService {
 	public void dataBackup() {
 		csvService.generateCSV(ccMasterRepository.findAll());
 	}
+	
+	public String keepAlive() {
+        return jdbcTemplate.queryForObject("SELECT NOW()", String.class);
+    }
 }
