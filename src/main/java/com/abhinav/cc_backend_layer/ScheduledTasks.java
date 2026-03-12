@@ -38,10 +38,10 @@ public class ScheduledTasks {
 		ccMasterService.sendNotifications();
 	}
 	
-	@Scheduled(cron = "0 10 0 * * *", zone = "Asia/Kolkata")
-	public void insertDailyRecord() {
-		employeeService.insertDailyRecord();
-	}
+//	@Scheduled(cron = "0 10 0 * * *", zone = "Asia/Kolkata")
+//	public void insertDailyRecord() {
+//		employeeService.insertDailyRecord();
+//	}
 	
 	@Scheduled(cron = "0 35 23 * * 0", zone = "Asia/Kolkata")
 	public void backup() {
