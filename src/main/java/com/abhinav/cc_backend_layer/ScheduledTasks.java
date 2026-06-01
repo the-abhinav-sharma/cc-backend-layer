@@ -59,11 +59,37 @@ public class ScheduledTasks {
 		ccMaster.setMinAmt(13000);
 		ccMaster.setTotalAmt(13000);
 		ccMaster.setStmtDate(new java.sql.Date(System.currentTimeMillis()));
-		ccMaster.setDueDate(getDueDate());
+		ccMaster.setDueDate(getDueDate(20));
 		ccMaster.setCurrentStatus("Bill Generated");
 
 		ccMaster.setKey(key);
 		log.info("PNB02 Record inserted:" + ccMasterService.create(ccMaster));
+		
+		key.setCode("SIP01");
+		key.setStmtMonthYear(getStmtMonthYear());
+		key.setUsername(authUserBP);
+
+		ccMaster.setMinAmt(10000);
+		ccMaster.setTotalAmt(10000);
+		ccMaster.setStmtDate(new java.sql.Date(System.currentTimeMillis()));
+		ccMaster.setDueDate(getDueDate(5));
+		ccMaster.setCurrentStatus("Bill Generated");
+
+		ccMaster.setKey(key);
+		log.info("SIP01 Record inserted:" + ccMasterService.create(ccMaster));
+		
+		key.setCode("SIP02");
+		key.setStmtMonthYear(getStmtMonthYear());
+		key.setUsername(authUserBP);
+
+		ccMaster.setMinAmt(5000);
+		ccMaster.setTotalAmt(5000);
+		ccMaster.setStmtDate(new java.sql.Date(System.currentTimeMillis()));
+		ccMaster.setDueDate(getDueDate(5));
+		ccMaster.setCurrentStatus("Bill Generated");
+
+		ccMaster.setKey(key);
+		log.info("SIP02 Record inserted:" + ccMasterService.create(ccMaster));
 	}
 
 	private String getStmtMonthYear() {
@@ -80,10 +106,10 @@ public class ScheduledTasks {
 		return monthStr + cal.get(Calendar.YEAR);
 	}
 
-	private java.sql.Date getDueDate() {
+	private java.sql.Date getDueDate(int date) {
 		Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("Asia/Kolkata"));
 		calendar.setTime(new Date(System.currentTimeMillis()));
-		calendar.add(Calendar.DAY_OF_MONTH, 20);
+		calendar.add(Calendar.DAY_OF_MONTH, date);
 		return new java.sql.Date(calendar.getTimeInMillis());
 	}
 }
