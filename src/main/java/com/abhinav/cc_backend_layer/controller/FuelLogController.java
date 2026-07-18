@@ -20,7 +20,7 @@ import com.abhinav.cc_backend_layer.model.FuelLog;
 
 @RestController
 @RequestMapping("/api/fuel-logs")
-@CrossOrigin(origins = "*") // Adjust for production
+@CrossOrigin(origins = "*")
 public class FuelLogController {
 
 	@Autowired
@@ -38,10 +38,19 @@ public class FuelLogController {
                     .body("Unauthorized: Invalid admin write credentials.");
         }
 		
-		// Simple sanity check: calculate rate if one is missing, or keep raw values
 		if (log.getRatePerLitre() == null && log.getLitres() > 0) {
 			log.setRatePerLitre(log.getAmountSpent() / log.getLitres());
 		}
+
+		// Enforce data consistency based on chosen environment selection
+		if (log.getTripType() == FuelLog.TripType.CITY) {
+			log.setCityPercentage(100);
+		} else if (log.getTripType() == FuelLog.TripType.HIGHWAY) {
+			log.setCityPercentage(0);
+		} else if (log.getCityPercentage() == null) {
+			log.setCityPercentage(50); // Sensible fallback default for mixed
+		}
+		
 		return ResponseEntity.ok(repository.save(log));
 	}
 
@@ -66,16 +75,35 @@ public class FuelLogController {
 			totalLitres += log.getLitres();
 		}
 
-		// Calculate mileage (requires at least 2 entries)
+		// Comprehensive Mileage Segment Breakdown
 		double averageMileage = 0;
+		double cityDistance = 0, cityLitres = 0;
+		double highwayDistance = 0, highwayLitres = 0;
+
 		if (logs.size() > 1) {
 			double totalDistance = logs.get(logs.size() - 1).getOdometerReading() - logs.get(0).getOdometerReading();
-			// We exclude the litres of the very first log because that fuel was used to get
-			// to the first reading
 			double comparativeLitres = 0;
+
 			for (int i = 1; i < logs.size(); i++) {
-				comparativeLitres += logs.get(i).getLitres();
+				FuelLog currentLog = logs.get(i);
+				FuelLog previousLog = logs.get(i - 1);
+				
+				double segmentDistance = currentLog.getOdometerReading() - previousLog.getOdometerReading();
+				double segmentLitres = currentLog.getLitres();
+				
+				comparativeLitres += segmentLitres;
+
+				// Weight distance/litres by your UI percentage configurations
+				double cityFactor = (currentLog.getCityPercentage() != null ? currentLog.getCityPercentage() : 50) / 100.0;
+				double highwayFactor = 1.0 - cityFactor;
+
+				cityDistance += segmentDistance * cityFactor;
+				cityLitres += segmentLitres * cityFactor;
+
+				highwayDistance += segmentDistance * highwayFactor;
+				highwayLitres += segmentLitres * highwayFactor;
 			}
+			
 			averageMileage = comparativeLitres > 0 ? totalDistance / comparativeLitres : 0;
 		}
 
@@ -83,8 +111,12 @@ public class FuelLogController {
 		stats.put("totalLitres", totalLitres);
 		stats.put("averageMileage", averageMileage);
 		stats.put("logCount", logs.size());
+		
+		// Return sub-segmented metrics to supply frontend visualizations cleanly
+		stats.put("cityMileage", cityLitres > 0 ? cityDistance / cityLitres : 0);
+		stats.put("highwayMileage", highwayLitres > 0 ? highwayDistance / highwayLitres : 0);
 
-		// Simple linear predictive run-rate (assuming past 30 days average)
+		// Simple linear predictive run-rate calculation
 		double monthlyPrediction = totalSpend;
 		if (logs.size() > 1) {
 			long daysBetween = java.time.temporal.ChronoUnit.DAYS.between(logs.get(0).getLogDate(),

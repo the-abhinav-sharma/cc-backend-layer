@@ -39,8 +39,18 @@ public class FuelLog {
     @Column(name = "fuel_type", nullable = false)
     private FuelType fuelType;
 
-    // Getters, Setters, and Constructors
+    @Enumerated(EnumType.STRING)
+    @Column(name = "trip_type", nullable = false)
+    private TripType tripType;
+
+    @Column(name = "city_percentage")
+    private Integer cityPercentage; // Values from 0 to 100
+
     public enum FuelType {
         NORMAL, XP100
+    }
+
+    public enum TripType {
+        CITY, HIGHWAY, MIXED
     }
 }
