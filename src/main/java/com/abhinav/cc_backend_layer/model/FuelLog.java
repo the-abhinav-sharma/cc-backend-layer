@@ -45,6 +45,9 @@ public class FuelLog {
 
     @Column(name = "city_percentage")
     private Integer cityPercentage; // Values from 0 to 100
+    
+    @Column(name = "known_highway_mileage")
+    private Double knownHighwayMileage; // Optional override value entered from car dash
 
     public enum FuelType {
         NORMAL, XP100
