@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.abhinav.cc_backend_layer.model.FuelLog;
+import com.abhinav.cc_backend_layer.model.PendingTripLog;
+import com.abhinav.cc_backend_layer.repository.PendingTripLogRepository;
 
 @RestController
 @RequestMapping("/api/fuel-logs")
@@ -25,33 +27,64 @@ public class FuelLogController {
 
 	@Autowired
 	private FuelLogRepository repository;
+	
+	@Autowired
+	private PendingTripLogRepository pendingTripRepository;
 
 	@Value("${pit.stop.pin}")
 	private String adminWritePin;
 
 	@PostMapping
 	public ResponseEntity<?> createLog(@RequestHeader(value = "X-Admin-Pin", required = false) String pin,
-			@RequestBody FuelLog log) {
-		
-		if (pin == null || !pin.equals(adminWritePin)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body("Unauthorized: Invalid admin write credentials.");
-        }
-		
-		if (log.getRatePerLitre() == null && log.getLitres() > 0) {
-			log.setRatePerLitre(log.getAmountSpent() / log.getLitres());
-		}
+	        @RequestBody FuelLog log) {
+	    
+	    if (pin == null || !pin.equals(adminWritePin)) {
+	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+	                .body("Unauthorized: Invalid admin write credentials.");
+	    }
+	    
+	    if (log.getRatePerLitre() == null && log.getLitres() > 0) {
+	        log.setRatePerLitre(log.getAmountSpent() / log.getLitres());
+	    }
 
-		// Enforce data consistency based on chosen environment selection
-		if (log.getTripType() == FuelLog.TripType.CITY) {
-			log.setCityPercentage(100);
-		} else if (log.getTripType() == FuelLog.TripType.HIGHWAY) {
-			log.setCityPercentage(0);
-		} else if (log.getCityPercentage() == null) {
-			log.setCityPercentage(50); // Sensible fallback default for mixed
-		}
-		
-		return ResponseEntity.ok(repository.save(log));
+	    // Enforce data consistency based on chosen environment selection
+	    if (log.getTripType() == FuelLog.TripType.CITY) {
+	        log.setCityPercentage(100);
+	    } else if (log.getTripType() == FuelLog.TripType.HIGHWAY) {
+	        log.setCityPercentage(0);
+	    } else if (log.getCityPercentage() == null) {
+	        log.setCityPercentage(50); // Sensible fallback default for mixed
+	    }
+
+	    // --- AUTO-CONSUMPTION OF PENDING TRIP QUEUE ---
+	    // Only aggregate pending drives if user didn't manually override it in the refuel form
+	    if (log.getKnownHighwayMileage() == null) {
+	        List<PendingTripLog> pendingTrips = pendingTripRepository.findAll();
+
+	        if (!pendingTrips.isEmpty()) {
+	            double totalWeightedMileage = 0;
+	            double totalHighwayKm = 0;
+
+	            for (PendingTripLog trip : pendingTrips) {
+	                totalWeightedMileage += (trip.getDistanceKm() * trip.getKnownHighwayMileage());
+	                totalHighwayKm += trip.getDistanceKm();
+	            }
+
+	            if (totalHighwayKm > 0) {
+	                // Weighted average calculation: sum(distance * mileage) / totalDistance
+	                double calculatedHwyMileage = totalWeightedMileage / totalHighwayKm;
+	                log.setKnownHighwayMileage(calculatedHwyMileage);
+	            }
+
+	            // Flush the queue after linking to this fill-up
+	            pendingTripRepository.deleteAll();
+	        }
+	    } else {
+	        // If the user manually provided a value during refuel, clear the queue anyway so it doesn't leak into the next fill-up
+	        pendingTripRepository.deleteAll();
+	    }
+
+	    return ResponseEntity.ok(repository.save(log));
 	}
 
 	@GetMapping
