@@ -71,12 +71,30 @@ public class FuelLogController {
 	            }
 
 	            if (totalHighwayKm > 0) {
-	                // Weighted average calculation: sum(distance * mileage) / totalDistance
+	                // 1. Weighted Highway Mileage
 	                double calculatedHwyMileage = totalWeightedMileage / totalHighwayKm;
 	                log.setKnownHighwayMileage(calculatedHwyMileage);
+
+	                // 2. Fetch latest log to get previous odometer reading
+	                FuelLog latestLog = repository.findTopByOrderByOdometerReadingDesc();
+	                if (latestLog != null) {
+	                    double totalSegmentDistance = log.getOdometerReading() - latestLog.getOdometerReading();
+	                    if (totalSegmentDistance > 0) {
+	                        double hwyPct = (totalHighwayKm / totalSegmentDistance) * 100.0;
+	                        double cityPct = 100.0 - hwyPct;
+	                        
+	                        // Set automatically and clamp between 0 and 100
+	                        int finalCityPct = (int) Math.max(0, Math.min(100, Math.round(cityPct)));
+	                        log.setCityPercentage(finalCityPct);
+	                        
+	                        // Set trip type to MIXED if split is between 1% and 99%
+	                        if (finalCityPct > 0 && finalCityPct < 100) {
+	                            log.setTripType(FuelLog.TripType.MIXED);
+	                        }
+	                    }
+	                }
 	            }
 
-	            // Flush the queue after linking to this fill-up
 	            pendingTripRepository.deleteAll();
 	        }
 	    } else {

@@ -16,14 +16,14 @@ import com.abhinav.cc_backend_layer.model.PendingTripLog;
 import com.abhinav.cc_backend_layer.repository.PendingTripLogRepository;
 
 @RestController
-@RequestMapping("/api/fuel-logs")
+@RequestMapping("/api/pending-trips")
 @CrossOrigin(origins = "*")
 public class TripLogController {
 	
 	@Autowired
 	private PendingTripLogRepository pendingTripLogRepository;
 	
-	@PostMapping("/api/pending-trips")
+	@PostMapping
 	public ResponseEntity<PendingTripLog> createPendingTrip(@RequestBody PendingTripLog trip) {
 	    if (trip.getLogDate() == null) {
 	        trip.setLogDate(LocalDate.now());
@@ -31,7 +31,7 @@ public class TripLogController {
 	    return ResponseEntity.ok(pendingTripLogRepository.save(trip));
 	}
 	
-	@GetMapping("/api/pending-trips")
+	@GetMapping
 	public ResponseEntity<List<PendingTripLog>> getPendingTrips() {
 	    return ResponseEntity.ok(pendingTripLogRepository.findAll());
 	}

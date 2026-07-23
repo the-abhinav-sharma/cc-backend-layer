@@ -12,4 +12,6 @@ public interface FuelLogRepository extends JpaRepository<FuelLog, Long> {
 
 	List<FuelLog> findAllByOrderByOdometerReadingAsc();
 
+	FuelLog findTopByOrderByOdometerReadingDesc();
+
 }
