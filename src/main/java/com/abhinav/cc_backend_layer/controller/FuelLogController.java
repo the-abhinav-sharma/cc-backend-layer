@@ -144,14 +144,28 @@ public class FuelLogController {
 	    stats.put("cityMileage", cityLitres > 0 ? cityDistance / cityLitres : 0);
 	    stats.put("highwayMileage", highwayLitres > 0 ? highwayDistance / highwayLitres : 0);
 
-	    // Simple linear predictive run-rate calculation
+	    // Enhanced 30-Day Expense Prediction
 	    double monthlyPrediction = totalSpend;
+
 	    if (logs.size() > 1) {
-	        long daysBetween = java.time.temporal.ChronoUnit.DAYS.between(logs.get(0).getLogDate(),
-	                logs.get(logs.size() - 1).getLogDate());
+	        long daysBetween = java.time.temporal.ChronoUnit.DAYS.between(
+	            logs.get(0).getLogDate(),
+	            logs.get(logs.size() - 1).getLogDate()
+	        );
+
 	        if (daysBetween > 0) {
-	            double dailySpend = totalSpend / daysBetween;
-	            monthlyPrediction = dailySpend * 30;
+	            double totalDistance = logs.get(logs.size() - 1).getOdometerReading() - logs.get(0).getOdometerReading();
+	            
+	            // Sum spend for completed trip segments (excluding the initial baseline fill-up)
+	            double comparativeSpend = 0;
+	            for (int i = 1; i < logs.size(); i++) {
+	                comparativeSpend += logs.get(i).getAmountSpent();
+	            }
+
+	            double dailyKm = totalDistance / daysBetween;               // e.g., 429 km / 5 days = 85.8 km/day
+	            double costPerKm = comparativeSpend / totalDistance;       // e.g., ₹3,300 / 429 km = ₹7.69/km
+	            
+	            monthlyPrediction = (dailyKm * 30) * costPerKm;              // ~₹19,794/month
 	        }
 	    }
 	    stats.put("predictedMonthlyExpense", monthlyPrediction);
