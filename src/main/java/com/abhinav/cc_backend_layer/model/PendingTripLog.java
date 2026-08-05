@@ -30,5 +30,8 @@ public class PendingTripLog {
     
     @Column(name = "notes")
     private String notes;
+    
+    @Column(name = "is_consumed")
+    private boolean isConsumed = false;
 
 }

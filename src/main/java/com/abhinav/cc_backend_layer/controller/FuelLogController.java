@@ -57,12 +57,12 @@ public class FuelLogController {
 			log.setCityPercentage(50); // Sensible fallback default for mixed
 		}
 
-		// --- AUTO-CONSUMPTION OF PENDING TRIP QUEUE ---
-		// Only aggregate pending drives if user didn't manually override it in the refuel form
-		if (log.getKnownHighwayMileage() == null) {
-			List<PendingTripLog> pendingTrips = pendingTripRepository.findAll();
+		// --- SOFT CONSUMPTION OF PENDING TRIP QUEUE ---
+		// Fetch only unconsumed trips
+		List<PendingTripLog> pendingTrips = pendingTripRepository.findByIsConsumedFalse();
 
-			if (!pendingTrips.isEmpty()) {
+		if (!pendingTrips.isEmpty()) {
+			if (log.getKnownHighwayMileage() == null) {
 				double totalWeightedMileage = 0;
 				double totalHighwayKm = 0;
 
@@ -95,12 +95,13 @@ public class FuelLogController {
 						}
 					}
 				}
-
-				pendingTripRepository.deleteAll();
 			}
-		} else {
-			// If the user manually provided a value during refuel, clear the queue anyway so it doesn't leak into the next fill-up
-			pendingTripRepository.deleteAll();
+
+			// Soft delete: Mark pending trips as consumed rather than deleting them
+			for (PendingTripLog trip : pendingTrips) {
+				trip.setConsumed(true);
+			}
+			pendingTripRepository.saveAll(pendingTrips);
 		}
 
 		return ResponseEntity.ok(repository.save(log));
