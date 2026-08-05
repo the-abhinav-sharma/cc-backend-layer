@@ -200,23 +200,25 @@ public class FuelLogController {
 		double monthlyPrediction = totalSpend;
 
 		if (logs.size() > 1) {
-			long daysBetween = ChronoUnit.DAYS.between(
-				logs.get(0).getLogDate(),
-				logs.get(logs.size() - 1).getLogDate()
-			);
+		    // Both logDate values are already LocalDate objects
+		    java.time.LocalDate startDate = logs.get(0).getLogDate();
+		    java.time.LocalDate endDate = logs.get(logs.size() - 1).getLogDate();
 
-			if (daysBetween > 0) {
-				// Sum spend for completed trip segments (excluding the initial baseline fill-up)
-				double comparativeSpend = 0;
-				for (int i = 1; i < logs.size(); i++) {
-					comparativeSpend += logs.get(i).getAmountSpent();
-				}
+		    long daysBetween = java.time.temporal.ChronoUnit.DAYS.between(startDate, endDate);
 
-				// Daily expenditure pace across active tracking period multiplied for 30 days
-				double dailySpendRate = comparativeSpend / daysBetween;
-				monthlyPrediction = dailySpendRate * 30.0;
-			}
+		    if (daysBetween > 0) {
+		        // Sum spend for completed trip segments (excluding the initial baseline fill-up)
+		        double activeSpend = 0;
+		        for (int i = 1; i < logs.size(); i++) {
+		            activeSpend += logs.get(i).getAmountSpent();
+		        }
+
+		        // Active rate: ₹11,500 spent over 18 days = ₹638.88/day -> ₹19,167 for 30 days
+		        double dailyRate = activeSpend / (double) daysBetween;
+		        monthlyPrediction = Math.round(dailyRate * 30.0);
+		    }
 		}
+
 		stats.put("predictedMonthlyExpense", monthlyPrediction);
 
 		return ResponseEntity.ok(stats);
