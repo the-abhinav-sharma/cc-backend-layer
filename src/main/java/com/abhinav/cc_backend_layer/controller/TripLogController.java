@@ -35,7 +35,8 @@ public class TripLogController {
 	
 	@GetMapping
 	public ResponseEntity<List<PendingTripLog>> getPendingTrips() {
-	    return ResponseEntity.ok(pendingTripLogRepository.findAll());
+		List<PendingTripLog> activeTrips = pendingTripLogRepository.findByIsConsumedFalse();
+	    return ResponseEntity.ok(activeTrips);
 	}
 	
 	@DeleteMapping("/{id}")
