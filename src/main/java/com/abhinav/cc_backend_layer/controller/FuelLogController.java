@@ -132,59 +132,62 @@ public class FuelLogController {
 		double cityDistance = 0, cityLitres = 0;
 		double highwayDistance = 0, highwayLitres = 0;
 
+		// Inside getStats() method of FuelLogController.java
 		if (logs.size() > 1) {
-			double totalDistance = logs.get(logs.size() - 1).getOdometerReading() - logs.get(0).getOdometerReading();
-			double comparativeLitres = 0;
+		    double totalDistance = logs.get(logs.size() - 1).getOdometerReading() - logs.get(0).getOdometerReading();
+		    
+		    double accDistance = 0;
+		    double accLitres = 0;
+		    double comparativeLitres = 0;
 
-			for (int i = 1; i < logs.size(); i++) {
-				FuelLog currentLog = logs.get(i);
-				FuelLog previousLog = logs.get(i - 1);
-				
-				double segmentDistance = currentLog.getOdometerReading() - previousLog.getOdometerReading();
-				double segmentLitres = currentLog.getLitres();
-				
-				comparativeLitres += segmentLitres;
+		    for (int i = 1; i < logs.size(); i++) {
+		        FuelLog currentLog = logs.get(i);
+		        FuelLog previousLog = logs.get(i - 1);
+		        
+		        double segmentDistance = currentLog.getOdometerReading() - previousLog.getOdometerReading();
+		        double segmentLitres = currentLog.getLitres();
+		        
+		        comparativeLitres += segmentLitres;
 
-				double cityPct = (currentLog.getCityPercentage() != null ? currentLog.getCityPercentage() : 50) / 100.0;
-				double hwyPct = 1.0 - cityPct;
+		        double cityPct = (currentLog.getCityPercentage() != null ? currentLog.getCityPercentage() : 50) / 100.0;
+		        double hwyPct = 1.0 - cityPct;
 
-				double d_c = segmentDistance * cityPct;
-				double d_h = segmentDistance * hwyPct;
+		        double d_c = segmentDistance * cityPct;
+		        double d_h = segmentDistance * hwyPct;
 
-				double L_c = 0;
-				double L_h = 0;
+		        // Carry forward liters and distances safely across partial fills
+		        accDistance += segmentDistance;
+		        accLitres += segmentLitres;
 
-				if (currentLog.getTripType() == FuelLog.TripType.CITY) {
-					L_c = segmentLitres;
-					L_h = 0;
-				} else if (currentLog.getTripType() == FuelLog.TripType.HIGHWAY) {
-					L_c = 0;
-					L_h = segmentLitres;
-				} else {
-					// MIXED TRIP HYBRID LOGIC
-					if (currentLog.getKnownHighwayMileage() != null && currentLog.getKnownHighwayMileage() > 0) {
-						// Exact calculation using car dashboard figure
-						L_h = d_h / currentLog.getKnownHighwayMileage();
-						
-						// Safety check to ensure highway fuel does not exceed total fill volume
-						L_h = Math.min(L_h, segmentLitres);
-						L_c = segmentLitres - L_h;
-					} else {
-						// Ratio estimation (Highway assumed 1.35x as efficient as City)
-						double ratio = 1.35;
-						L_c = segmentLitres * (d_c / (d_c + (ratio * d_h)));
-						L_h = segmentLitres - L_c;
-					}
-				}
+		        double L_c = 0;
+		        double L_h = 0;
 
-				cityDistance += d_c;
-				cityLitres += L_c;
+		        if (currentLog.getTripType() == FuelLog.TripType.CITY) {
+		            L_c = segmentLitres;
+		            L_h = 0;
+		        } else if (currentLog.getTripType() == FuelLog.TripType.HIGHWAY) {
+		            L_c = 0;
+		            L_h = segmentLitres;
+		        } else {
+		            if (currentLog.getKnownHighwayMileage() != null && currentLog.getKnownHighwayMileage() > 0) {
+		                L_h = d_h / currentLog.getKnownHighwayMileage();
+		                L_h = Math.min(L_h, segmentLitres);
+		                L_c = segmentLitres - L_h;
+		            } else {
+		                double ratio = 1.35;
+		                L_c = segmentLitres * (d_c / (d_c + (ratio * d_h)));
+		                L_h = segmentLitres - L_c;
+		            }
+		        }
 
-				highwayDistance += d_h;
-				highwayLitres += L_h;
-			}
-			
-			averageMileage = comparativeLitres > 0 ? totalDistance / comparativeLitres : 0;
+		        cityDistance += d_c;
+		        cityLitres += L_c;
+
+		        highwayDistance += d_h;
+		        highwayLitres += L_h;
+		    }
+		    
+		    averageMileage = comparativeLitres > 0 ? totalDistance / comparativeLitres : 0;
 		}
 
 		stats.put("totalSpend", totalSpend);
