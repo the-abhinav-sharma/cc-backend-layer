@@ -135,6 +135,11 @@ public class FrontController {
 	public UserSession login(@RequestBody Users users) {
 		return loginService.login(users);
 	}
+	
+	@PostMapping("/logmein")
+	public UserSession logmein(@RequestBody Users users) {
+		return loginService.login(users);
+	}
 
 	@PostMapping("/logout")
 	public boolean logout(@RequestBody Users users) {
