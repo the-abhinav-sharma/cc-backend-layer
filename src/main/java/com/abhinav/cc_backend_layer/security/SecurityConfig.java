@@ -45,6 +45,8 @@ public class SecurityConfig {
                 .requestMatchers("/monthlyTotal/**").permitAll()
                 .requestMatchers("/cardlyTotal/**").permitAll()
                 .requestMatchers("/cardNames").permitAll()
+                .requestMatchers("/api/fuel-logs/**").permitAll()
+                .requestMatchers("/api/pending-trips/**").permitAll()
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
