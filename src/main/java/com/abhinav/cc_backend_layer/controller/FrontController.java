@@ -141,6 +141,12 @@ public class FrontController {
 		loginService.logout(users.getUsername());
 		return true;
 	}
+	
+	@PostMapping("/logmeout")
+	public boolean logmeout(@RequestBody Users users) {
+		loginService.logout(users.getUsername());
+		return true;
+	}
 
 //	private boolean checkAuthTokenOld(String authHeader) {
 //		if(authHeader.equals(authHeaderBP)) {
